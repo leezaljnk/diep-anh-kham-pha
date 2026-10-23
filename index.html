@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11183f">
+  <link rel="icon" href="data:,">
+  <title>Nhà thám hiểm khoa học</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101638;
+      --panel: rgba(255, 255, 255, .09);
+      --line: rgba(255, 255, 255, .16);
+      --text: #fffdf7;
+      --muted: #c6cbea;
+      --yellow: #ffd166;
+      --green: #5ee6a8;
+      --red: #ff8290;
+      --blue: #72d4ff;
+      --purple: #c4a3ff;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .25);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(800px 500px at 5% 0%, rgba(75, 117, 255, .24), transparent 65%),
+        radial-gradient(700px 450px at 100% 100%, rgba(180, 93, 255, .2), transparent 60%),
+        linear-gradient(145deg, #111735, #21184d);
+    }
+
+    button { font: inherit; }
+    button:focus-visible, select:focus-visible {
+      outline: 3px solid var(--yellow);
+      outline-offset: 3px;
+    }
+
+    .app { width: min(1180px, 100%); margin: 0 auto; padding: 20px 24px 34px; }
+    .topbar { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+    .brand-icon {
+      display: grid; place-items: center; width: 56px; height: 56px; flex: 0 0 auto;
+      border: 1px solid var(--line); border-radius: 19px;
+      background: linear-gradient(140deg, #7c5cff, #39bce6); font-size: 31px;
+      box-shadow: 0 8px 28px rgba(73, 124, 255, .28);
+    }
+    .brand h1 { margin: 0; font-size: clamp(21px, 3vw, 29px); line-height: 1.1; }
+    .brand p { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
+    .top-spacer { flex: 1; }
+    .top-button, .button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 48px; padding: 10px 17px; border: 1px solid var(--line);
+      border-radius: 15px; color: var(--text); background: var(--panel);
+      cursor: pointer; font-weight: 750; transition: transform .15s, filter .15s;
+    }
+    .top-button:hover, .button:hover { filter: brightness(1.12); transform: translateY(-2px); }
+    .button.primary {
+      border: 0; color: #271b48; background: linear-gradient(135deg, #ffe17c, #ffad5b);
+      box-shadow: 0 8px 24px rgba(255, 177, 75, .24);
+    }
+    .button.green { border: 0; background: linear-gradient(135deg, #58e2a4, #2ab7b2); color: #06372f; }
+    .button:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    .screen { display: none; }
+    .screen.active { display: block; animation: appear .24s ease-out; }
+    @keyframes appear { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .hero {
+      display: grid; grid-template-columns: 1.05fr .95fr; gap: 24px; align-items: center;
+      padding: 30px; border: 1px solid var(--line); border-radius: 30px;
+      background: linear-gradient(120deg, rgba(255,255,255,.1), rgba(255,255,255,.035));
+      box-shadow: var(--shadow);
+    }
+    .eyebrow { color: var(--yellow); font-size: 13px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+    .hero h2 { max-width: 650px; margin: 9px 0 12px; font-size: clamp(32px, 5vw, 54px); line-height: 1.05; }
+    .hero p { max-width: 620px; margin: 0; color: var(--muted); font-size: 17px; line-height: 1.6; }
+    .hero-art {
+      display: grid; place-items: center; min-height: 190px; border-radius: 25px;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 209, 102, .18), transparent 65%);
+      font-size: clamp(95px, 16vw, 165px); filter: drop-shadow(0 15px 20px rgba(0,0,0,.2));
+    }
+    .section-heading { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; margin: 30px 0 15px; }
+    .section-heading h3 { margin: 0; font-size: 23px; }
+    .section-heading p { margin: 4px 0 0; color: var(--muted); }
+    .topic-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; }
+    .topic-card {
+      display: flex; flex-direction: column; min-height: 224px; padding: 20px;
+      border: 1px solid var(--line); border-radius: 23px; color: var(--text);
+      text-align: left; background: var(--panel); box-shadow: var(--shadow);
+      cursor: pointer; transition: transform .18s, border-color .18s, background .18s;
+    }
+    .topic-card:hover { transform: translateY(-5px); }
+    .topic-card.selected { border: 2px solid var(--yellow); background: rgba(255, 209, 102, .12); }
+    .topic-emoji { font-size: 47px; margin-bottom: 13px; }
+    .topic-card strong { font-size: 18px; }
+    .topic-card small { margin-top: 7px; color: var(--muted); line-height: 1.45; }
+    .topic-card .grade { margin-top: auto; padding-top: 14px; color: var(--yellow); font-size: 12px; font-weight: 800; }
+    .setup-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 20px; }
+    .difficulty { display: flex; flex-wrap: wrap; gap: 8px; }
+    .difficulty button {
+      min-height: 44px; padding: 9px 15px; border: 1px solid var(--line); border-radius: 14px;
+      color: var(--muted); background: rgba(255,255,255,.05); cursor: pointer; font-weight: 750;
+    }
+    .difficulty button.selected { border-color: var(--purple); color: #fff; background: rgba(196,163,255,.2); }
+    .setup-row .button { min-width: 165px; margin-left: auto; }
+    .privacy-note { margin: 13px 0 0; color: var(--muted); font-size: 13px; }
+
+    .game-head { display: flex; flex-wrap: wrap; align-items: center; gap: 13px; margin-bottom: 14px; }
+    .game-head .button { min-height: 43px; }
+    .progress-wrap { flex: 1; min-width: 160px; }
+    .progress-label { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 7px; color: var(--muted); font-size: 13px; font-weight: 700; }
+    .progress-track { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.14); }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #62e1ae, #ffd166); transition: width .3s; }
+    .score-pill { padding: 10px 15px; border: 1px solid rgba(255,209,102,.35); border-radius: 15px; color: var(--yellow); background: rgba(255,209,102,.1); font-weight: 850; }
+    .question-layout { display: grid; grid-template-columns: minmax(210px, .72fr) minmax(0, 1.6fr); gap: 18px; }
+    .scene-card, .question-card, .hint-card, .feedback, .stat-card {
+      border: 1px solid var(--line); border-radius: 25px; background: var(--panel); box-shadow: var(--shadow);
+    }
+    .scene-card { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 330px; padding: 24px; text-align: center; }
+    .scene-art { display: grid; place-items: center; width: 100%; min-height: 175px; font-size: clamp(82px, 12vw, 125px); }
+    .scene-caption { color: var(--muted); font-weight: 650; line-height: 1.5; }
+    .question-card { padding: clamp(20px, 3vw, 30px); }
+    .question-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 13px; }
+    .tag { padding: 6px 10px; border-radius: 999px; color: #e8dbff; background: rgba(196,163,255,.17); font-size: 12px; font-weight: 800; }
+    .question-card h2 { margin: 0 0 21px; font-size: clamp(23px, 3vw, 32px); line-height: 1.28; }
+    .answers { display: grid; gap: 11px; }
+    .answer {
+      display: flex; align-items: center; gap: 13px; width: 100%; min-height: 62px; padding: 12px 15px;
+      border: 1px solid var(--line); border-radius: 17px; color: var(--text); text-align: left;
+      background: rgba(255,255,255,.055); cursor: pointer; font-size: 17px; font-weight: 700;
+      transition: background .15s, border-color .15s, transform .15s;
+    }
+    .answer:hover:not(:disabled) { transform: translateX(3px); border-color: var(--blue); background: rgba(114,212,255,.1); }
+    .answer:disabled { cursor: default; }
+    .answer-letter { display: grid; place-items: center; width: 37px; height: 37px; flex: 0 0 auto; border-radius: 12px; color: #17203f; background: #a9dfff; font-weight: 900; }
+    .answer-illustration { display: grid; place-items: center; width: 40px; flex: 0 0 auto; font-size: 29px; }
+    .answer.correct { border-color: var(--green); background: rgba(94,230,168,.16); }
+    .answer.correct .answer-letter { background: var(--green); }
+    .answer.wrong { border-color: var(--red); background: rgba(255,130,144,.12); }
+    .answer.wrong .answer-letter { background: var(--red); }
+    .answer.dimmed { opacity: .42; }
+    .below-game { display: grid; grid-template-columns: minmax(0, 1fr) minmax(230px, .62fr); gap: 14px; margin-top: 14px; }
+    .feedback, .hint-card { display: flex; align-items: center; gap: 12px; min-height: 75px; padding: 15px 18px; }
+    .feedback { color: var(--muted); line-height: 1.45; }
+    .feedback .feedback-icon { font-size: 25px; }
+    .feedback-illustration { display: grid; place-items: center; width: 58px; height: 58px; flex: 0 0 auto; border-radius: 17px; background: rgba(255,255,255,.08); font-size: 38px; }
+    .feedback strong { display: block; color: var(--text); }
+    .hint-card { justify-content: space-between; gap: 10px; }
+    .hint-copy { color: var(--muted); font-size: 14px; line-height: 1.4; }
+    .hint-copy strong { display: block; margin-bottom: 3px; color: var(--yellow); }
+    .hint-card .button { min-height: 43px; flex: 0 0 auto; padding: 8px 12px; }
+    .keyboard-note { margin: 10px 0 0; color: var(--muted); text-align: center; font-size: 12px; }
+
+    .stats-intro { margin: 0 0 18px; color: var(--muted); line-height: 1.55; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+    .stat-card { padding: 20px; }
+    .stat-card small { color: var(--muted); font-weight: 700; }
+    .stat-card strong { display: block; margin-top: 7px; color: var(--yellow); font-size: 34px; }
+    .chart { display: grid; gap: 15px; padding: 22px; border: 1px solid var(--line); border-radius: 24px; background: var(--panel); }
+    .chart-row { display: grid; grid-template-columns: minmax(145px, .8fr) 2fr 82px; align-items: center; gap: 13px; }
+    .chart-label { font-size: 14px; font-weight: 750; }
+    .bar-track { display: flex; height: 15px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.12); }
+    .bar-correct { background: var(--green); transition: width .3s; }
+    .bar-wrong { background: var(--red); transition: width .3s; }
+    .chart-count { color: var(--muted); text-align: right; font-size: 13px; }
+    .history-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 17px; }
+    .empty-state { padding: 25px; color: var(--muted); text-align: center; }
+    .lab-heading { margin: 8px 0 19px; }
+    .lab-heading h2 { margin: 5px 0 7px; font-size: clamp(28px, 4vw, 40px); }
+    .lab-heading p { margin: 0; color: var(--muted); line-height: 1.5; }
+    .scenario-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+    .scenario-button {
+      display: flex; align-items: center; gap: 11px; min-height: 72px; padding: 12px 15px;
+      border: 1px solid var(--line); border-radius: 18px; color: var(--text);
+      text-align: left; background: var(--panel); cursor: pointer; font-weight: 800;
+    }
+    .scenario-button.selected { border-color: var(--yellow); background: rgba(255,209,102,.13); }
+    .scenario-button .scenario-emoji { font-size: 30px; }
+    .scenario-button small { display: block; margin-top: 3px; color: var(--muted); font-weight: 500; }
+    .lab-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr); gap: 16px; }
+    .simulation-stage {
+      position: relative; display: grid; place-items: center; align-self: start;
+      width: min(100%, 560px); aspect-ratio: 1; min-height: 0; justify-self: center; overflow: hidden;
+      border: 1px solid var(--line); border-radius: 25px;
+      background: linear-gradient(180deg, rgba(91,174,255,.17), rgba(76,201,167,.11) 74%, rgba(53,111,72,.18));
+    }
+    .simulation-stage svg { display: none; width: 100%; max-width: 100%; height: 100%; max-height: 100%; }
+    .simulation-stage[data-scenario="plant"] .plant-scene,
+    .simulation-stage[data-scenario="water"] .water-scene,
+    .simulation-stage[data-scenario="energy"] .energy-scene { display: block; }
+    .lab-controls { padding: 21px; border: 1px solid var(--line); border-radius: 25px; background: var(--panel); }
+    .lab-controls h3 { margin: 0 0 5px; font-size: 22px; }
+    .lab-controls > p { margin: 0 0 17px; color: var(--muted); line-height: 1.5; }
+    .range-control { margin: 17px 0 20px; }
+    .range-heading { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-weight: 750; }
+    .range-value { color: var(--yellow); font-variant-numeric: tabular-nums; }
+    .range-control input[type="range"] { width: 100%; height: 26px; margin: 0; accent-color: var(--yellow); cursor: grab; touch-action: pan-y; }
+    .range-control input[type="range"]:active { cursor: grabbing; }
+    .range-scale { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; }
+    .lab-result {
+      min-height: 88px; padding: 14px 16px; border: 1px solid rgba(94,230,168,.3); border-radius: 17px;
+      color: var(--muted); background: rgba(94,230,168,.08); line-height: 1.5;
+    }
+    .lab-result strong { display: block; margin-bottom: 4px; color: var(--green); }
+    .lab-question { margin: 14px 0 0; padding: 13px 15px; border-left: 3px solid var(--purple); border-radius: 0 13px 13px 0; color: #e7ddff; background: rgba(196,163,255,.09); line-height: 1.5; }
+    .lab-note { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .plant-growing { transform-box: view-box; transform-origin: 180px 326px; transition: transform .5s ease; }
+    .plant-leaves { transition: opacity .35s, fill .35s; transform-box: fill-box; transform-origin: center; }
+    .plant-flower { transition: opacity .35s; }
+    .plant-leaves.drooping { transform: rotate(22deg) scale(.82); }
+    .plant-leaves.pale { opacity: .55; }
+    .plant-leaves.heat-stress { filter: sepia(.8); }
+    .plant-stem { transition: stroke .35s; }
+    .water-vapor { animation: rise var(--vapor-duration, 2.3s) ease-in infinite; }
+    .water-vapor.delay-1 { animation-delay: .7s; }
+    .water-vapor.delay-2 { animation-delay: 1.4s; }
+    .water-wave { animation: wave 2.2s ease-in-out infinite alternate; }
+    .raindrop { animation: fall var(--rain-duration, 1.2s) linear infinite; }
+    .raindrop.delay-1 { animation-delay: .4s; }
+    .raindrop.delay-2 { animation-delay: .8s; }
+    @keyframes rise { from { transform: translateY(12px); opacity: .1; } 35% { opacity: .95; } to { transform: translateY(-82px); opacity: 0; } }
+    @keyframes fall { from { transform: translateY(-10px); opacity: 0; } 18% { opacity: 1; } 82% { opacity: 1; } to { transform: translateY(110px); opacity: 0; } }
+    .house-lights { transition: opacity .3s; filter: drop-shadow(0 0 8px #ffe68a); }
+    .wind-rotor { transform-box: fill-box; transform-origin: center; animation: spin 4s linear infinite; animation-play-state: paused; }
+    .water-wheel { transform-box: fill-box; transform-origin: center; animation: spin 3s linear infinite; animation-play-state: paused; }
+    .solar-panels { transition: opacity .35s, filter .35s; }
+    .village-water { animation: wave 2.5s ease-in-out infinite alternate; }
+    .energy-spark { opacity: 0; transition: opacity .3s; }
+    .simulation-stage[data-wind="true"] .wind-rotor { animation-play-state: running; }
+    .simulation-stage[data-water="true"] .water-wheel { animation-play-state: running; }
+    .simulation-stage[data-wind="true"] #windLines,
+    .simulation-stage[data-water="true"] #waterFlow { opacity: 1; }
+    .simulation-stage[data-powered="true"] .energy-spark { opacity: 1; }
+    .simulation-stage[data-powered="true"] .house-lights { animation: lamp-pulse 1.8s ease-in-out infinite alternate; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes wave { to { transform: translateX(8px); } }
+    @keyframes lamp-pulse { to { filter: drop-shadow(0 0 14px #ffe68a); } }
+    .effect-detail { margin-top: 9px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.12); font-size: 13px; }
+    .effect-detail + .effect-detail { margin-top: 6px; }
+    .lab-note { padding: 10px 12px; border-radius: 13px; background: rgba(255,255,255,.045); }
+    .notice {
+      position: fixed; right: 20px; bottom: 20px; z-index: 5; max-width: min(420px, calc(100% - 40px));
+      padding: 13px 17px; border: 1px solid rgba(255,130,144,.45); border-radius: 15px;
+      color: #fff; background: #44243c; box-shadow: var(--shadow); line-height: 1.45;
+    }
+    [hidden] { display: none !important; }
+
+    @media (max-width: 850px) {
+      .topic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .question-layout { grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr); }
+      .scene-card { min-height: 280px; }
+    }
+    @media (max-width: 620px) {
+      .app { padding: 14px 14px 28px; }
+      .topbar { gap: 10px; margin-bottom: 19px; }
+      .top-spacer { display: none; }
+      .brand { min-width: 0; flex: 1; }
+      .brand h1 { font-size: clamp(14px, 4vw, 16px); }
+      .brand p, #labButton span, #statsButton span { display: none; }
+      .brand-icon { width: 46px; height: 46px; font-size: 25px; border-radius: 15px; }
+      .top-button { min-height: 43px; padding: 8px 11px; font-size: 13px; }
+      .hero { grid-template-columns: 1fr; gap: 2px; padding: 22px; }
+      .hero-art { min-height: 110px; font-size: 95px; }
+      .topic-grid { gap: 10px; }
+      .topic-card { min-height: 195px; padding: 15px; border-radius: 19px; }
+      .topic-emoji { font-size: 39px; margin-bottom: 8px; }
+      .topic-card strong { font-size: 16px; }
+      .topic-card small { font-size: 12px; }
+      .setup-row .button { width: 100%; margin-left: 0; }
+      .question-layout { grid-template-columns: 1fr; gap: 12px; }
+      .scene-card { min-height: 130px; flex-direction: row; gap: 12px; padding: 12px 17px; text-align: left; }
+      .scene-art { width: 100px; min-height: 90px; flex: 0 0 auto; font-size: 70px; }
+      .question-card { padding: 19px; }
+      .answer { min-height: 56px; font-size: 15px; }
+      .answer-illustration { width: 34px; font-size: 25px; }
+      .feedback-illustration { width: 48px; height: 48px; font-size: 32px; }
+      .below-game { grid-template-columns: 1fr; }
+      .stats-grid { gap: 8px; }
+      .stat-card { padding: 14px; }
+      .stat-card small { font-size: 11px; }
+      .stat-card strong { font-size: 27px; }
+      .chart { padding: 15px; }
+      .chart-row { grid-template-columns: minmax(95px, .8fr) 1.3fr 70px; gap: 8px; }
+      .chart-label { font-size: 12px; }
+      .chart-count { font-size: 11px; }
+      .scenario-picker { gap: 7px; }
+      .scenario-button { min-height: 65px; gap: 6px; padding: 9px; font-size: 13px; }
+      .scenario-button .scenario-emoji { font-size: 24px; }
+      .scenario-button small { font-size: 10px; }
+      .lab-layout { grid-template-columns: 1fr; }
+      .lab-controls { padding: 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+      .water-vapor {
+        animation-duration: var(--vapor-duration, 2.3s) !important;
+        animation-iteration-count: infinite !important;
+      }
+      .raindrop {
+        animation-duration: var(--rain-duration, 1.2s) !important;
+        animation-iteration-count: infinite !important;
+      }
+      .water-wave, .village-water {
+        animation-duration: 2.5s !important;
+        animation-iteration-count: infinite !important;
+      }
+      .simulation-stage[data-wind="true"] .wind-rotor {
+        animation-duration: var(--wind-duration, 4s) !important;
+        animation-iteration-count: infinite !important;
+        animation-play-state: running !important;
+      }
+      .simulation-stage[data-water="true"] .water-wheel {
+        animation-duration: var(--water-duration, 3s) !important;
+        animation-iteration-count: infinite !important;
+        animation-play-state: running !important;
+      }
+      .simulation-stage[data-powered="true"] .house-lights { filter: drop-shadow(0 0 12px #ffe68a); }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand-icon" aria-hidden="true">🐻</div>
+      <div class="brand">
+        <h1>Bé khám phá thế giới</h1>
+        <p>Chơi để khám phá · Học theo cách của em</p>
+      </div>
+      <div class="top-spacer"></div>
+      <button class="top-button" id="labButton" type="button" aria-label="Mở phòng thí nghiệm">🧪 <span>Phòng thí nghiệm</span></button>
+      <button class="top-button" id="statsButton" type="button" aria-label="Xem tiến bộ">📊 <span>Tiến bộ</span></button>
+    </header>
+
+    <section class="screen active" id="homeScreen" aria-labelledby="welcomeTitle">
+      <div class="hero">
+        <div>
+          <div class="eyebrow">Cùng học qua trò chơi</div>
+          <h2 id="welcomeTitle">Bé sẵn sàng khám phá?</h2>
+          <p>Cùng chăm cây, làm quen với con vật, khám phá các giác quan và thời tiết quanh bé!</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">🌈🦋</div>
+      </div>
+
+      <div class="section-heading">
+        <div>
+          <h3>Chọn chủ đề vui</h3>
+          <p>Mỗi chủ đề có 20 câu hỏi ngắn ở mỗi mức chơi.</p>
+        </div>
+      </div>
+      <div class="topic-grid" id="topicGrid" aria-label="Các chủ đề khoa học"></div>
+
+      <div class="setup-row">
+        <div>
+          <div class="section-heading" style="margin:0 0 9px"><h3 style="font-size:17px">Chọn mức độ</h3></div>
+          <div class="difficulty" id="difficultyPicker" aria-label="Chọn mức độ">
+            <button type="button" data-level="1" class="selected">🌱 Bé khám phá</button>
+            <button type="button" data-level="2">🧭 Bé thử nhé</button>
+            <button type="button" data-level="3">🚀 Bé nhớ giỏi</button>
+          </div>
+        </div>
+        <button class="button primary" id="startButton" type="button" disabled>Chọn một hành trình →</button>
+      </div>
+      <p class="privacy-note">🔒 Hoạt động khám phá khoa học lớp 5-6 tuổi.</p>
+    </section>
+
+    <section class="screen" id="gameScreen" aria-label="Màn chơi">
+      <div class="game-head">
+        <button class="button" id="homeButton" type="button">← Chủ đề</button>
+        <div class="progress-wrap" aria-label="Tiến độ hành trình">
+          <div class="progress-label"><span id="progressTopic">Hành trình</span><span id="progressText">Câu 1/3</span></div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+        <div class="score-pill" aria-live="polite">⭐ <span id="scoreText">0</span></div>
+      </div>
+      <div class="question-layout">
+        <aside class="scene-card">
+          <div class="scene-art" id="sceneArt" aria-hidden="true"></div>
+          <div class="scene-caption" id="sceneCaption"></div>
+        </aside>
+        <section class="question-card" aria-labelledby="questionText">
+          <div class="question-meta">
+            <span class="tag" id="levelTag"></span>
+            <span class="tag" id="topicTag"></span>
+          </div>
+          <h2 id="questionText"></h2>
+          <div class="answers" id="answers" role="group" aria-label="Các đáp án"></div>
+        </section>
+      </div>
+      <div class="below-game">
+        <div class="feedback" id="feedback" aria-live="polite">
+          <span class="feedback-icon" aria-hidden="true">💡</span><span>Chọn một đáp án để khám phá nhé!</span>
+        </div>
+        <div class="hint-card">
+          <div class="hint-copy" id="hintCopy"><strong>Robot Thông Thái 🤖</strong>Em cần gợi ý? Robot sẽ giúp từng bước.</div>
+          <button class="button" id="hintButton" type="button">💡 Gợi ý (0/3)</button>
+        </div>
+      </div>
+      <p class="keyboard-note">Mẹo: dùng phím 1, 2, 3 để chọn đáp án; Enter để sang câu tiếp theo.</p>
+    </section>
+
+    <section class="screen" id="statsScreen" aria-labelledby="statsTitle">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">Bảng khám phá</div>
+          <h3 id="statsTitle">Tiến bộ của em</h3>
+        </div>
+        <button class="button" id="backFromStats" type="button">← Quay lại</button>
+      </div>
+      <p class="stats-intro">Biểu đồ tổng hợp các lần trả lời của em theo từng chủ đề trên thiết bị này.</p>
+      <div class="stats-grid">
+        <div class="stat-card"><small>Lần trả lời</small><strong id="totalAnswers">0</strong></div>
+        <div class="stat-card"><small>Chính xác</small><strong id="correctAnswers">0</strong></div>
+        <div class="stat-card"><small>Tỉ lệ đúng</small><strong id="accuracy">0%</strong></div>
+      </div>
+      <div class="chart" id="statsChart" aria-label="Biểu đồ kết quả theo chủ đề"></div>
+      <div class="history-actions">
+        <span class="privacy-note">Dữ liệu được lưu cục bộ bằng LocalStorage.</span>
+        <button class="button" id="clearHistoryButton" type="button">Xóa lịch sử trên thiết bị</button>
+      </div>
+    </section>
+
+    <section class="screen" id="simulationScreen" aria-labelledby="labTitle">
+      <div class="section-heading" style="margin-top:0">
+        <div><div class="eyebrow">Tự tay làm thí nghiệm</div></div>
+        <button class="button" id="backFromLab" type="button">← Quay lại</button>
+      </div>
+      <div class="lab-heading">
+        <h2 id="labTitle">Phòng thí nghiệm tương tác</h2>
+        <p>Kéo các thanh điều chỉnh và quan sát mô phỏng 2D thay đổi ngay trước mắt em.</p>
+      </div>
+      <div class="scenario-picker" id="scenarioPicker" role="group" aria-label="Chọn mô phỏng">
+        <button class="scenario-button selected" type="button" data-scenario="plant" aria-pressed="true">
+          <span class="scenario-emoji" aria-hidden="true">🌱</span><span>Cây cần gì?<small>Ánh sáng · nhiệt độ · nước</small></span>
+        </button>
+        <button class="scenario-button" type="button" data-scenario="water" aria-pressed="false">
+          <span class="scenario-emoji" aria-hidden="true">💧</span><span>Vòng tuần hoàn nước<small>Nắng · không khí lạnh</small></span>
+        </button>
+        <button class="scenario-button" type="button" data-scenario="energy" aria-pressed="false">
+          <span class="scenario-emoji" aria-hidden="true">⚡</span><span>Ngôi làng xanh<small>Nắng · gió · dòng nước</small></span>
+        </button>
+      </div>
+      <div class="lab-layout">
+        <div class="simulation-stage" id="simulationStage" data-scenario="plant" role="img" aria-label="Mô phỏng cây đang lớn lên">
+          <svg class="plant-scene" viewBox="0 0 360 360" aria-label="Cây non trong chậu dưới ánh sáng Mặt Trời" role="img">
+            <defs>
+              <linearGradient id="potGradient" x1="0" x2="1"><stop stop-color="#e78354"/><stop offset="1" stop-color="#a94d44"/></linearGradient>
+              <radialGradient id="sunGradient"><stop stop-color="#fff5b0"/><stop offset="1" stop-color="#ffbd4a"/></radialGradient>
+            </defs>
+            <circle cx="180" cy="150" r="112" fill="rgba(255,255,255,.07)"/>
+            <circle id="plantSun" cx="285" cy="67" r="31" fill="url(#sunGradient)" opacity=".75"/>
+            <g stroke="#ffe69a" stroke-width="4" stroke-linecap="round" opacity=".6" id="sunRays">
+              <path d="M285 19V8M285 126v-11M237 67h-12M345 67h-12M251 33l-8-8M327 109l-8-8M319 33l8-8M243 109l8-8"/>
+            </g>
+            <path d="M0 286 Q90 270 180 286 T360 280 V360 H0Z" fill="#315f55"/>
+            <ellipse cx="180" cy="321" rx="111" ry="16" fill="rgba(0,0,0,.18)"/>
+            <path d="M119 263H241L226 332Q180 350 134 332Z" fill="url(#potGradient)"/>
+            <ellipse cx="180" cy="264" rx="61" ry="12" fill="#68413a"/>
+            <ellipse cx="180" cy="260" rx="52" ry="8" fill="#49352f"/>
+            <g class="plant-growing" id="plantGrowing">
+              <path class="plant-stem" id="plantStem" d="M180 260 C178 235 184 210 180 183 C178 166 181 151 180 136" fill="none" stroke="#74d68c" stroke-width="8" stroke-linecap="round"/>
+              <g class="plant-leaves" id="plantLeaves" fill="#57c77d">
+                <path d="M180 223 C156 218 140 203 139 185 C158 186 176 198 180 223Z"/>
+                <path d="M181 207 C203 201 218 186 219 169 C199 171 184 185 181 207Z"/>
+                <path d="M180 183 C159 178 148 165 149 150 C166 152 179 165 180 183Z"/>
+                <path d="M180 170 C199 164 208 150 207 136 C191 139 181 151 180 170Z"/>
+              </g>
+              <g class="plant-flower" id="plantFlower" opacity=".15">
+                <path d="M180 139V122" stroke="#74d68c" stroke-width="6" stroke-linecap="round"/>
+                <circle cx="180" cy="114" r="8" fill="#ffd166"/><circle cx="171" cy="114" r="7" fill="#ff8fa3"/>
+                <circle cx="189" cy="114" r="7" fill="#ff8fa3"/><circle cx="180" cy="105" r="7" fill="#ff8fa3"/>
+              </g>
+            </g>
+            <path d="M151 286Q180 278 209 286" fill="none" stroke="#82d5ff" stroke-width="4" stroke-linecap="round" opacity=".65" id="soilWater"/>
+          </svg>
+          <svg class="water-scene" viewBox="0 0 360 360" aria-label="Mặt trời làm nước bốc hơi, tạo mây và mưa" role="img">
+            <circle id="waterSun" cx="70" cy="76" r="35" fill="#ffd166" opacity=".7"/>
+            <path d="M0 258 Q90 243 180 258 T360 253 V360 H0Z" fill="#3c9cc5"/>
+            <path d="M0 284Q90 270 180 284T360 280V360H0Z" fill="#27749e" opacity=".8"/>
+            <path class="water-wave" d="M0 258 Q90 243 180 258 T360 253" fill="none" stroke="#a5eaff" stroke-width="5"/>
+            <g id="vaporGroup" fill="#b8efff">
+              <circle class="water-vapor" cx="102" cy="240" r="7"/><circle class="water-vapor delay-1" cx="155" cy="244" r="6"/>
+              <circle class="water-vapor delay-2" cx="206" cy="238" r="8"/><circle class="water-vapor delay-1" cx="258" cy="244" r="6"/>
+            </g>
+            <g id="waterCloud" fill="#eaf7ff">
+              <circle cx="158" cy="123" r="30"/><circle cx="193" cy="105" r="43"/><circle cx="234" cy="126" r="31"/>
+              <rect x="147" y="122" width="100" height="32" rx="16"/>
+            </g>
+            <g id="rainGroup" fill="#a6e8ff" opacity=".1" style="--rain-duration:1.2s">
+              <path class="raindrop" d="M151 175q-8 12 0 15q8-3 0-15Z"/><path class="raindrop delay-1" d="M169 192q-8 12 0 15q8-3 0-15Z"/>
+              <path class="raindrop delay-2" d="M185 172q-8 12 0 15q8-3 0-15Z"/><path class="raindrop" d="M202 190q-8 12 0 15q8-3 0-15Z"/>
+              <path class="raindrop delay-1" d="M218 175q-8 12 0 15q8-3 0-15Z"/><path class="raindrop delay-2" d="M237 191q-8 12 0 15q8-3 0-15Z"/>
+              <path class="raindrop" d="M251 175q-8 12 0 15q8-3 0-15Z"/><path class="raindrop delay-1" d="M177 215q-8 12 0 15q8-3 0-15Z"/>
+              <path class="raindrop delay-2" d="M224 217q-8 12 0 15q8-3 0-15Z"/>
+            </g>
+            <text x="180" y="329" fill="#e8f6ff" font-size="15" text-anchor="middle">SÔNG, HỒ VÀ MẶT ĐẤT</text>
+          </svg>
+          <svg class="energy-scene" viewBox="0 0 360 360" aria-label="Ngôi làng sử dụng năng lượng sạch" role="img">
+            <circle cx="290" cy="58" r="31" fill="#ffd166" opacity=".75" id="energySun"/>
+            <path d="M0 259Q100 233 190 259T360 250V360H0Z" fill="#3f8065"/>
+            <path class="village-water" d="M0 300Q90 290 180 300T360 293V360H0Z" fill="#287eae"/>
+            <g fill="#ead2a7" stroke="#fff0ce" stroke-width="3">
+              <path d="M39 206L90 161L141 206V279H39Z"/><path d="M199 207L248 164L297 207V276H199Z"/>
+            </g>
+            <path d="M30 207L90 151L151 207" fill="none" stroke="#bd8b68" stroke-width="12" stroke-linejoin="round"/>
+            <path d="M190 208L248 154L307 208" fill="none" stroke="#bd8b68" stroke-width="12" stroke-linejoin="round"/>
+            <rect x="78" y="225" width="25" height="54" rx="3" fill="#91604f"/><rect x="232" y="224" width="29" height="25" rx="3" fill="#6eb8da"/>
+            <path d="M48 199l42-39 43 39" fill="#4286ad"/>
+            <g class="solar-panels" id="solarPanels" opacity=".55">
+              <path d="M65 185l25-23 25 23z" fill="#7bc9ed" stroke="#d5f4ff" stroke-width="2"/>
+              <path d="M90 164v19M77 174h27" stroke="#d5f4ff" stroke-width="1"/>
+            </g>
+            <path d="M208 199l40-38 41 38" fill="#4286ad"/>
+            <g class="house-lights" id="houseLights" opacity=".15" fill="#fff1a1">
+              <path d="M55 211h20v21H55z"/><path d="M111 211h20v21h-20z"/><path d="M211 211h17v18h-17z"/><path d="M271 211h17v18h-17z"/>
+            </g>
+            <g stroke="#e9f5ff" stroke-width="5" stroke-linecap="round">
+              <path d="M174 157v72"/>
+              <g id="windLines" fill="none" stroke="#b8eaff" stroke-width="4" stroke-linecap="round" opacity="0">
+                <path d="M111 125h30"/><path d="M101 143h30"/><path d="M113 161h23"/>
+              </g>
+              <g class="wind-rotor" id="windRotor">
+                <path d="M174 157L174 116M174 157L138 178M174 157L210 178" fill="none" stroke="#f5fbff" stroke-width="8" stroke-linecap="round"/>
+                <circle cx="174" cy="157" r="7" fill="#ffd166" stroke="#fff4c2" stroke-width="2"/>
+              </g>
+            </g>
+            <g class="water-wheel" id="waterWheel" fill="none" stroke="#b9e9ff" stroke-width="5">
+              <circle cx="55" cy="310" r="18"/><path d="M55 288v44M33 310h44M39 294l32 32M71 294l-32 32"/>
+            </g>
+            <g id="waterFlow" fill="none" stroke="#9de7ff" stroke-width="3" stroke-linecap="round" opacity="0">
+              <path d="M83 292h20m-7-6 7 6-7 6"/><path d="M112 300h18m-7-6 7 6-7 6"/>
+            </g>
+            <g class="energy-spark" id="energySpark" fill="#fff1a1">
+              <path d="M150 216l-9 15h9l-5 12 15-18h-10z"/>
+              <path d="M300 216l-9 15h9l-5 12 15-18h-10z"/>
+            </g>
+            <text x="180" y="331" fill="#e8f6ff" font-size="15" text-anchor="middle" id="energyStatusLabel">LÀNG ĐANG CHỜ NĂNG LƯỢNG</text>
+          </svg>
+        </div>
+        <section class="lab-controls" aria-labelledby="scenarioTitle">
+          <h3 id="scenarioTitle">Cây cần gì để lớn khỏe?</h3>
+          <p id="scenarioDescription">Thử thay đổi từng yếu tố. Em có thể kéo nút tròn hoặc dùng phím mũi tên để điều chỉnh.</p>
+          <div id="rangeControls"></div>
+          <div class="lab-result" id="simulationResult" aria-live="polite"></div>
+          <p class="lab-question" id="simulationQuestion"></p>
+          <p class="lab-note" id="simulationNote">Mô phỏng giúp quan sát mối liên hệ giữa các yếu tố; cây thật còn chịu ảnh hưởng của đất, giống cây và nhiều điều kiện khác.</p>
+        </section>
+      </div>
+    </section>
+  </main>
+  <div class="notice" id="notice" role="alert" hidden></div>
+
+  <script>
+    "use strict";
+
+    const STORAGE_KEY = "nha-tham-hiem-khoa-hoc-history-v1";
+    let nextAnswerPosition = 0;
+    const makeQuestion = (text, options, answer, explain, hints, art, scene) => {
+      const correctAnswer = options[answer];
+      const choices = options.filter((_, index) => index !== answer);
+      const answerPosition = Math.floor(Math.random() * options.length);
+      choices.splice(answerPosition, 0, correctAnswer);
+      return {
+        text, options: choices, answer: answerPosition, explain,
+        hints: [...hints, `Đáp án là ${correctAnswer}.`],
+        art, scene
+      };
+    };
+    const topics = [
+      {
+        id: "plant", title: "Hạt mầm lớn lên", emoji: "🌱", grade: "DÀNH CHO BÉ 3–5 TUỔI",
+        summary: "Chăm sóc cây và xem hạt mầm lớn lên.", caption: "Cùng chăm sóc một hạt mầm nhỏ nhé!",
+        questions: {
+          1: [
+            makeQuestion("Cây cần gì để uống?", ["Nước", "Nước ngọt", "Nước biển"], 0, "Cây cần nước để sống và lớn lên.", ["Cây cũng cần uống nước mỗi ngày.", "Nước trong bình tưới giúp cây tươi tốt."], "🌱💧", "Tưới nước cho cây."),
+            makeQuestion("Cây cần gì từ bầu trời để lớn khỏe?", ["Ánh nắng", "Kẹo ngọt", "Đồ chơi"], 0, "Ánh nắng giúp cây lớn khỏe.", ["Cây thích được ở nơi sáng.", "Mặt Trời tỏa ánh sáng."], "🌞🌿", "Cây đón nắng."),
+            makeQuestion("Hạt mầm lớn lên thành gì?", ["Cây", "Viên sỏi", "Cái ô"], 0, "Hạt mầm có thể lớn thành một cái cây.", ["Hạt mầm nhú lên khỏi đất.", "Cây có lá xanh."], "🌰🌱", "Hạt mầm nhú lên thành cây.")
+          ],
+          2: [
+            makeQuestion("Cây đang khát. Bé nên làm gì?", ["Tưới nước", "Cất cây vào tủ", "Cho cây ăn bánh"], 0, "Tưới một lượng nước vừa đủ giúp cây tươi lại.", ["Cây cần được uống.", "Dùng bình tưới cây nhé."], "🪴🚿", "Bé tưới nước cho cây."),
+            makeQuestion("Cây sẽ vui hơn ở đâu?", ["Nơi có ánh sáng", "Trong hộp kín", "Dưới gầm giường tối"], 0, "Cây cần ánh sáng để lớn lên.", ["Cây thích nơi sáng sủa.", "Hãy đặt cây gần cửa sổ."], "🪴🪟", "Đặt cây nơi có ánh sáng."),
+            makeQuestion("Cái nào là một phần của cây?", ["Lá xanh", "Cái thìa", "Quả bóng"], 0, "Lá là một phần của cây.", ["Bộ phận này thường mọc trên cành.", "Lá có thể màu xanh."], "🍃🌿", "Nhận biết lá cây.")
+          ],
+          3: [
+            makeQuestion("Bé muốn trồng hạt. Bé đặt hạt ở đâu?", ["Trong đất", "Trên ghế", "Trong giày"], 0, "Hạt được gieo vào đất để bắt đầu lớn lên.", ["Hạt cần một chỗ êm trong chậu.", "Bé có thể vùi hạt vào đất."], "🪴🌰", "Gieo hạt vào đất."),
+            makeQuestion("Đất khô và cây rũ lá. Bé giúp cây thế nào?", ["Tưới thêm nước", "Bẻ lá", "Che cây trong hộp"], 0, "Cây có thể đang cần nước; bé hãy nhờ người lớn giúp tưới vừa đủ.", ["Cây có vẻ đang khát.", "Bình tưới sẽ giúp ích."], "🌿💦", "Giúp cây đang khát."),
+            makeQuestion("Bé chăm cây bằng cách nào?", ["Tưới nước vừa đủ", "Giẫm lên cây", "Bứt hết lá"], 0, "Tưới nước vừa đủ và nhẹ nhàng chăm sóc giúp cây lớn khỏe.", ["Hãy đối xử nhẹ nhàng với cây.", "Dùng bình tưới, không làm cây đau."], "👧🪴", "Bé chăm sóc cây nhẹ nhàng.")
+          ]
+        }
+      },
+      {
+        id: "animals", title: "Bé làm quen với các con vật", emoji: "🐾", grade: "DÀNH CHO BÉ 3–5 TUỔI",
+        summary: "Nghe tiếng kêu và tìm nhà của các con vật.", caption: "Cùng khám phá những người bạn động vật!",
+        questions: {
+          1: [
+            makeQuestion("Con mèo kêu thế nào?", ["Meo meo", "Ò ó o", "Quạc quạc"], 0, "Mèo thường kêu meo meo.", ["Tiếng kêu này rất quen thuộc trong nhà.", "Mèo kêu “meo meo”."], "🐱💬", "Mèo kêu meo meo."),
+            makeQuestion("Con nào thích gặm cà rốt?", ["Thỏ", "Cá", "Vịt"], 0, "Thỏ thích ăn rau và có thể gặm cà rốt.", ["Con vật này có đôi tai dài.", "Thỏ thích rau củ."], "🐰🥕", "Thỏ ăn cà rốt."),
+            makeQuestion("Con cá sống ở đâu?", ["Dưới nước", "Trên cây", "Trong tủ"], 0, "Cá sống trong nước.", ["Cá bơi bằng vây.", "Cá sống trong ao, hồ hoặc biển."], "🐟💧", "Cá bơi dưới nước.")
+          ],
+          2: [
+            makeQuestion("Con nào có cánh và biết bay?", ["Chim", "Mèo", "Cá"], 0, "Chim có cánh và nhiều loài chim biết bay.", ["Con vật này có lông vũ.", "Chim vỗ cánh để bay."], "🐦🪽", "Chim vỗ cánh bay."),
+            makeQuestion("Chó thường thích ăn gì?", ["Thức ăn cho chó", "Đá cuội", "Bút chì"], 0, "Chó cần thức ăn phù hợp; bé hãy nhờ người lớn cho chó ăn.", ["Đây là món dành riêng cho bạn chó.", "Bé nhớ hỏi người lớn trước khi cho thú cưng ăn nhé."], "🐶🥣", "Cho chó ăn thức ăn phù hợp."),
+            makeQuestion("Con nào sống trong chuồng và cho trứng?", ["Gà", "Cá voi", "Hổ"], 0, "Gà mái có thể đẻ trứng.", ["Con vật này thường có mào.", "Gà mái đẻ trứng."], "🐔🥚", "Gà mái và quả trứng.")
+          ],
+          3: [
+            makeQuestion("Bé nghe “gụ gụ” trên cành cây. Có thể là con gì?", ["Chim bồ câu", "Con cá", "Con thỏ"], 0, "Chim bồ câu thường gù gù.", ["Con vật này có cánh và đậu trên cành.", "Tiếng kêu là “gụ gụ”."], "🕊️🌳", "Chim bồ câu trên cành."),
+            makeQuestion("Con nào cần nước để bơi?", ["Cá", "Gà", "Mèo"], 0, "Cá sống và bơi dưới nước.", ["Con vật này có vây.", "Cá bơi trong nước."], "🐠🌊", "Cá bơi trong nước."),
+            makeQuestion("Bé muốn vuốt ve một con vật lạ. Bé nên làm gì trước?", ["Hỏi người lớn", "Chạy lại ôm ngay", "Chọc vào con vật"], 0, "Hãy hỏi người lớn trước để giữ an toàn cho bé và con vật.", ["Mình chưa biết con vật có muốn được chạm vào không.", "Nhờ người lớn hướng dẫn nhé."], "🧒🐕", "Hỏi người lớn trước khi đến gần con vật lạ.")
+          ]
+        }
+      },
+      {
+        id: "senses", title: "Năm giác quan kỳ diệu", emoji: "👀", grade: "DÀNH CHO BÉ 3–5 TUỔI",
+        summary: "Nhìn, nghe, ngửi và cảm nhận thế giới quanh bé.", caption: "Các giác quan giúp bé khám phá mọi điều!",
+        questions: {
+          1: [
+            makeQuestion("Bé dùng gì để nhìn thấy cầu vồng?", ["Mắt", "Tai", "Mũi"], 0, "Mắt giúp bé nhìn thấy màu sắc và hình ảnh.", ["Bộ phận này ở trên khuôn mặt.", "Bé chớp mắt để nhìn."], "👀🌈", "Dùng mắt ngắm cầu vồng."),
+            makeQuestion("Bé dùng gì để nghe tiếng chuông?", ["Tai", "Mắt", "Bàn chân"], 0, "Tai giúp bé nghe âm thanh.", ["Bộ phận này ở hai bên đầu.", "Chuông kêu leng keng, bé nghe bằng tai."], "👂🔔", "Dùng tai nghe tiếng chuông."),
+            makeQuestion("Bé ngửi mùi hoa bằng gì?", ["Mũi", "Tay", "Tai"], 0, "Mũi giúp bé ngửi mùi hương.", ["Bộ phận này ở giữa khuôn mặt.", "Bé hít thở bằng mũi."], "👃🌸", "Dùng mũi ngửi hương hoa.")
+          ],
+          2: [
+            makeQuestion("Bé muốn biết chiếc khăn mềm hay ráp. Bé dùng gì?", ["Bàn tay", "Tai", "Mắt nhắm"], 0, "Bàn tay giúp bé cảm nhận đồ vật mềm hay ráp.", ["Bé có thể chạm nhẹ vào khăn.", "Bộ phận này ở cuối cánh tay."], "✋🧣", "Chạm nhẹ vào chiếc khăn."),
+            makeQuestion("Tiếng trống vang “tùng tùng”. Bé nghe bằng gì?", ["Tai", "Mũi", "Miệng"], 0, "Tai giúp bé nghe tiếng trống.", ["Âm thanh đi vào hai bên đầu.", "Bé có thể bịt tai khi tiếng quá to."], "🥁👂", "Lắng nghe tiếng trống."),
+            makeQuestion("Bé nếm vị ngọt của quả chuối bằng gì?", ["Lưỡi", "Tai", "Mắt"], 0, "Lưỡi giúp bé cảm nhận vị; chỉ ăn thức ăn người lớn cho phép nhé.", ["Bộ phận này ở trong miệng.", "Bé dùng nó để nếm vị ngọt."], "🍌👅", "Nếm quả chuối người lớn đưa.")
+          ],
+          3: [
+            makeQuestion("Bé nghe tiếng “meo meo” nhưng chưa thấy bạn mèo. Bé dùng gì để tìm?", ["Mắt", "Mũi", "Lưỡi"], 0, "Bé có thể dùng mắt nhìn quanh để tìm bạn mèo.", ["Bé đã nghe thấy rồi, giờ hãy quan sát nhé.", "Bộ phận giúp bé nhìn là đôi mắt."], "🐱👀", "Nhìn quanh tìm bạn mèo."),
+            makeQuestion("Bé muốn biết món canh có nóng không. Bé nên làm gì?", ["Hỏi người lớn", "Chạm tay vào nồi", "Nếm ngay"], 0, "Hãy hỏi người lớn; không chạm vào nồi nóng hay nếm món ăn khi chưa được phép.", ["Món ăn nóng có thể làm bỏng.", "Nhờ người lớn kiểm tra giúp bé."], "🍲🧑", "Nhờ người lớn kiểm tra món ăn nóng."),
+            makeQuestion("Hoa thơm, bé cảm nhận mùi bằng gì?", ["Mũi", "Tai", "Đầu gối"], 0, "Mũi giúp bé ngửi mùi thơm của hoa.", ["Bé hít thở bằng bộ phận này.", "Mũi ở giữa khuôn mặt."], "🌷👃", "Ngửi hương hoa nhẹ nhàng.")
+          ]
+        }
+      },
+      {
+        id: "weather", title: "Thời tiết quanh bé", emoji: "🌦️", grade: "DÀNH CHO BÉ 3–5 TUỔI",
+        summary: "Chọn đồ dùng phù hợp khi nắng, mưa hay trời lạnh.", caption: "Nhìn trời xem hôm nay mình cần gì nhé!",
+        questions: {
+          1: [
+            makeQuestion("Trời mưa, bé mang gì để không bị ướt?", ["Ô", "Kính bơi", "Quạt giấy"], 0, "Chiếc ô giúp che mưa cho bé.", ["Bé có thể cầm vật này trên đầu.", "Mở chiếc ô khi đi dưới mưa nhé."], "🌧️☂️", "Dùng ô khi trời mưa."),
+            makeQuestion("Trời nắng chói chang. Bé đội gì?", ["Mũ", "Ủng", "Khăn tắm"], 0, "Mũ giúp che nắng cho đầu bé.", ["Bé đội vật này lên đầu.", "Mũ giúp che ánh nắng."], "🌞🧢", "Đội mũ khi trời nắng."),
+            makeQuestion("Trời lạnh, bé mặc gì cho ấm?", ["Áo khoác", "Áo tắm", "Quần đùi"], 0, "Áo khoác giúp bé giữ ấm khi trời lạnh.", ["Bé mặc thêm một lớp áo.", "Áo này thường dày và ấm."], "🥶🧥", "Mặc áo khoác khi trời lạnh.")
+          ],
+          2: [
+            makeQuestion("Bầu trời nhiều mây đen và có mưa. Bé lấy gì?", ["Áo mưa", "Kính râm", "Đồ bơi"], 0, "Áo mưa giúp bé đỡ bị ướt khi ra ngoài.", ["Bé mặc vật này bên ngoài quần áo.", "Vật này giúp chắn nước mưa."], "☁️🌧️", "Mặc áo mưa."),
+            makeQuestion("Trời nóng, bé thấy khát. Bé nên uống gì?", ["Nước", "Nước biển", "Nước trong lọ hóa chất"], 0, "Uống nước sạch giúp bé giải khát; nhờ người lớn nếu cần.", ["Cơ thể cần nước sạch.", "Chỉ uống đồ người lớn đưa nhé."], "🌞🥤", "Uống nước sạch khi trời nóng."),
+            makeQuestion("Gió thổi mạnh và trời mát. Bé nên mặc gì?", ["Áo khoác nhẹ", "Đồ bơi", "Áo ba lỗ mỏng"], 0, "Áo khoác nhẹ giúp bé đỡ lạnh khi có gió.", ["Gió làm bé cảm thấy lạnh hơn.", "Bé có thể khoác thêm áo."], "🌬️🧥", "Khoác áo khi trời có gió.")
+          ],
+          3: [
+            makeQuestion("Bé thấy mây đen và nghe tiếng sấm. Bé nên làm gì?", ["Vào nhà cùng người lớn", "Đứng dưới cây cao", "Ra ngoài chơi"], 0, "Khi có sấm, bé nên vào trong nhà và ở cùng người lớn.", ["Sấm báo hiệu trời có thể có giông.", "Vào nơi kín và nhờ người lớn nhé."], "⛈️🏠", "Vào nhà khi trời có giông."),
+            makeQuestion("Trời mưa, đường có vũng nước. Bé đi thế nào?", ["Đi cùng người lớn, bước cẩn thận", "Chạy thật nhanh", "Nhảy xuống vũng sâu"], 0, "Đi cùng người lớn và bước cẩn thận giúp bé an toàn.", ["Đường ướt có thể trơn.", "Nắm tay người lớn nhé."], "🌧️👣", "Đi cẩn thận khi trời mưa."),
+            makeQuestion("Hôm nay trời nắng. Bé cần làm gì khi ra ngoài?", ["Đội mũ và đi cùng người lớn", "Đi chân đất một mình", "Nhìn thẳng vào Mặt Trời"], 0, "Đội mũ và đi cùng người lớn giúp bé an toàn khi ra ngoài trời nắng.", ["Ánh nắng có thể chói và nóng.", "Đừng bao giờ nhìn thẳng vào Mặt Trời."], "☀️🧢", "Che nắng và đi cùng người lớn.")
+          ]
+        }
+      }
+    ];
+
+    function addQuestionRows(topicId, level, rows) {
+      const topic = topics.find(item => item.id === topicId);
+      if (!topic) throw new Error(`Không tìm thấy chủ đề ${topicId}.`);
+      topic.questions[level].push(...rows.map(([text, correct, wrongOne, wrongTwo, explain, hintOne, hintTwo, art]) =>
+        makeQuestion(text, [correct, wrongOne, wrongTwo], 0, explain, [hintOne, hintTwo], art, explain)
+      ));
+    }
+
+    addQuestionRows("plant", 1, [
+      ["Cây thường có màu lá gì?", "Màu xanh", "Màu tím chấm bi", "Màu bạc", "Nhiều chiếc lá có màu xanh.", "Hãy nhìn những chiếc lá.", "Lá thường xanh như cỏ.", "🍃"],
+      ["Bộ phận nào thường nằm dưới đất?", "Rễ", "Bông hoa", "Quả", "Rễ cây thường nằm trong đất.", "Rễ giúp cây bám vào đất.", "Rễ ở phía dưới cây.", "🌱"],
+      ["Bộ phận nào đỡ cành và lá?", "Thân cây", "Cái chậu", "Đám mây", "Thân cây nâng đỡ cành và lá.", "Nhìn phần đứng giữa rễ và cành.", "Phần đó là thân cây.", "🌳"],
+      ["Cây non thường bắt đầu từ gì?", "Hạt", "Viên bi", "Vỏ sò", "Nhiều cây bắt đầu lớn lên từ hạt.", "Hạt nhỏ có thể nảy mầm.", "Gieo hạt để cây bắt đầu lớn.", "🌰"],
+      ["Bông hoa thường mọc ở đâu?", "Trên cây", "Dưới đôi giày", "Trong chiếc cốc", "Hoa có thể mọc trên cây hoặc cành.", "Hãy nhìn chậu hoa.", "Bông hoa ở trên cây.", "🌼"],
+      ["Cây được trồng trong vật gì?", "Chậu cây", "Hộp bút", "Nồi cơm", "Chậu có thể đựng đất để trồng cây.", "Vật này thường đặt ở ban công.", "Đó là một chiếc chậu.", "🪴"],
+      ["Quả chín thường có thể mọc trên gì?", "Cây", "Cái bàn", "Đôi tất", "Nhiều loại quả mọc trên cây.", "Hãy nghĩ đến cây cam.", "Quả cam mọc trên cây.", "🍊"],
+      ["Cây nhỏ có thể có bộ phận nào màu xanh?", "Lá", "Cái thìa", "Viên đá", "Lá cây thường có màu xanh.", "Bộ phận này rung rinh trên cành.", "Đó là chiếc lá.", "🍀"],
+      ["Cây nào thường có gai?", "Cây xương rồng", "Cây chuối", "Cây lúa", "Một số cây xương rồng có gai.", "Cây này sống tốt ở nơi khô.", "Đó là xương rồng.", "🌵"],
+      ["Cây chuối có thể cho quả gì?", "Quả chuối", "Quả dưa hấu", "Quả dâu tây", "Cây chuối cho những nải chuối.", "Quả này cong và thường có vỏ vàng.", "Đó là quả chuối.", "🍌"],
+      ["Cây hoa hướng về đâu để đón nắng?", "Phía có ánh sáng", "Vào trong tủ", "Dưới gầm bàn", "Cây cần ánh sáng để lớn lên.", "Hãy tìm nơi sáng hơn.", "Cây hướng về phía có nắng.", "🌻"],
+      ["Hạt giống thường có kích thước thế nào?", "Nhỏ", "Lớn như cái bàn", "Lớn như ngôi nhà", "Nhiều hạt giống rất nhỏ.", "Hãy nhìn một hạt đậu.", "Hạt đậu nhỏ nằm trong tay bé.", "🫘"],
+      ["Cây rau thường lớn lên trong gì?", "Đất", "Nước ngọt có ga", "Cát đồ chơi", "Rau thường được trồng trong đất.", "Rau mọc trong vườn.", "Đất giúp rễ bám và lớn.", "🥬"],
+      ["Cây cần được đặt ở nơi nào?", "Nơi có không khí", "Trong túi kín", "Trong ngăn kéo", "Cây cần không khí để sống.", "Cây sống ngoài vườn.", "Đặt cây ở nơi thoáng.", "🌿"],
+      ["Quả táo mọc trên gì?", "Cây táo", "Cây thông Noel", "Bụi cỏ", "Quả táo mọc trên cây táo.", "Hãy tìm loại cây có tên giống quả.", "Đó là cây táo.", "🍎"],
+      ["Bộ phận nào có thể nở thành hoa?", "Nụ hoa", "Viên sỏi", "Cái lá khô", "Nụ hoa có thể nở thành bông hoa.", "Nụ nhỏ nằm trên cành.", "Nụ sẽ nở thành hoa.", "🌷"],
+      ["Cây mọc trong vườn thường đứng ở đâu?", "Trên mặt đất", "Trên mái nhà", "Trong chiếc cặp", "Cây thường có rễ ở dưới đất.", "Cây mọc trong luống vườn.", "Cây đứng trên đất.", "🌱"]
+    ]);
+    addQuestionRows("plant", 2, [
+      ["Lá cây bị bụi bẩn, bé nên làm gì cùng người lớn?", "Lau nhẹ lá", "Bứt hết lá", "Tô màu lên lá", "Có thể nhẹ nhàng lau lá cùng người lớn.", "Cây cần được chăm nhẹ nhàng.", "Dùng khăn mềm lau thật nhẹ.", "🧽"],
+      ["Chậu cây bị đổ, bé nên làm gì?", "Gọi người lớn giúp", "Tự nhặt mảnh vỡ", "Đá chậu đi", "Nhờ người lớn giúp dọn chậu an toàn.", "Chậu vỡ có thể làm xước tay.", "Gọi người lớn nhé.", "🪴"],
+      ["Cây bị lá rũ vào ngày nắng, bé nên làm gì?", "Báo người lớn để kiểm tra cây", "Kéo mạnh cành lên", "Đặt cây cạnh bếp nóng", "Người lớn có thể kiểm tra xem cây cần nước hay bóng mát.", "Cây có vẻ không khỏe.", "Nhờ người lớn chăm cây.", "🌿"],
+      ["Khi gieo hạt, bé phủ hạt bằng gì?", "Một ít đất", "Kẹo", "Đá lớn", "Một lớp đất mỏng giúp hạt nằm yên.", "Hạt được gieo trong chậu.", "Phủ hạt bằng ít đất.", "🪴"],
+      ["Cây trong phòng cần đặt ở đâu vào ban ngày?", "Nơi sáng gần cửa sổ", "Trong tủ đóng kín", "Dưới chăn", "Nơi sáng giúp cây nhận ánh sáng.", "Tìm một nơi có nắng dịu.", "Đặt gần cửa sổ.", "🪟"],
+      ["Mưa lớn làm đất trong chậu sũng nước. Bé nên làm gì?", "Báo người lớn kiểm tra chậu", "Đổ thêm nước", "Bịt hết lỗ thoát nước", "Người lớn có thể giúp để chậu thoát nước phù hợp.", "Đất đang quá ướt.", "Nhờ người lớn xem chậu cây.", "🌧️"],
+      ["Bé muốn chăm cây khi đi học xa. Bé nên làm gì?", "Nhờ người lớn chăm giúp", "Để cây trong tủ", "Mang cây đi một mình", "Nhờ người lớn chăm cây khi bé vắng nhà.", "Cây cần được chăm đều.", "Nhờ người lớn giúp nhé.", "🧑‍🧒"],
+      ["Lá vàng rụng dưới gốc cây, bé nên làm gì?", "Nhờ người lớn cùng dọn", "Ăn thử chiếc lá", "Ném lá vào bạn", "Bé có thể nhờ người lớn giúp dọn lá rụng.", "Hãy giữ vườn sạch.", "Cùng người lớn nhặt lá.", "🍂"],
+      ["Cây con bị cỏ che mất ánh sáng, bé nên làm gì?", "Nhờ người lớn dọn cỏ", "Giẫm lên cây", "Che thêm cây", "Người lớn có thể dọn cỏ để cây nhận ánh sáng.", "Cây con cần khoảng sáng.", "Nhờ người lớn giúp dọn cỏ.", "🌱"],
+      ["Bình tưới quá nặng với bé, bé nên làm gì?", "Nhờ người lớn tưới giúp", "Cố bê lên cao", "Đổ nước ra sàn", "Nhờ người lớn giúp để tránh làm đổ nước hoặc bị đau.", "Bình nặng có thể khó cầm.", "Gọi người lớn giúp nhé.", "🚿"],
+      ["Cây ở ngoài trời nắng gắt, người lớn có thể làm gì?", "Chuyển cây đến nơi mát hơn", "Đặt cây cạnh lò", "Bọc cây bằng túi kín", "Một số cây cần được che nắng gắt.", "Nắng quá mạnh có thể làm cây héo.", "Nhờ người lớn tìm chỗ mát.", "🌤️"],
+      ["Bé thấy sâu trên lá rau, bé nên làm gì?", "Báo người lớn", "Chạm tay vào sâu", "Ăn chiếc lá đó", "Báo người lớn để kiểm tra cây an toàn.", "Đừng tự chạm vào con vật lạ.", "Gọi người lớn nhé.", "🐛"],
+      ["Đất trong chậu khô và nứt, bé nên làm gì?", "Hỏi người lớn xem cây cần tưới không", "Đổ cả xô nước", "Bỏ chậu đi", "Người lớn có thể kiểm tra và tưới lượng nước phù hợp.", "Đất trông rất khô.", "Hỏi người lớn trước khi tưới.", "🪴"],
+      ["Cây có cành gãy sau gió lớn, bé nên làm gì?", "Báo người lớn", "Kéo cành gãy", "Leo lên cây", "Người lớn sẽ giúp kiểm tra cành gãy an toàn.", "Cành cây có thể rơi.", "Đứng xa và gọi người lớn.", "🌬️"],
+      ["Bé muốn hái quả trên cành cao, bé nên làm gì?", "Nhờ người lớn hái giúp", "Tự trèo lên cây", "Ném đồ vào cành", "Người lớn có thể lấy quả an toàn.", "Cành cao khó với tới.", "Không tự trèo, hãy nhờ người lớn.", "🍐"],
+      ["Sau khi chăm cây, bé nên làm gì?", "Rửa tay bằng xà phòng", "Lau tay vào áo", "Cho tay vào miệng", "Rửa tay giúp giữ vệ sinh sau khi chơi với đất.", "Tay có thể dính đất.", "Rửa tay sạch nhé.", "🧼"],
+      ["Cây trong chậu nhỏ đã lớn, bé nên làm gì?", "Nhờ người lớn xem có cần chậu lớn hơn", "Kéo cây khỏi đất", "Đập vỡ chậu", "Người lớn có thể chuyển cây sang chậu phù hợp.", "Rễ cây cần chỗ để lớn.", "Hỏi người lớn về chậu mới.", "🪴"]
+    ]);
+    addQuestionRows("plant", 3, [
+      ["Cây ở góc tối có lá nhạt màu. Bé nghĩ cây cần gì?", "Thêm ánh sáng phù hợp", "Đậy kín cây", "Tưới nước ngọt", "Cây cần ánh sáng phù hợp để khỏe mạnh.", "Góc tối có ít ánh sáng.", "Đưa cây đến nơi sáng hơn cùng người lớn.", "🌤️"],
+      ["Một chậu có đất khô, chậu kia ướt sũng. Cây nào cần được kiểm tra tưới nước?", "Chậu đất khô", "Chậu ướt sũng", "Cả hai đều không cần xem", "Đất khô có thể cần nước, còn đất sũng không nên tưới thêm.", "Hãy so sánh độ ẩm của hai chậu.", "Chậu đất khô cần được kiểm tra.", "🪴"],
+      ["Vì sao rễ cây nằm trong đất?", "Để hút nước và bám vào đất", "Để tạo tiếng kêu", "Để bay lên trời", "Rễ giúp cây hút nước và đứng vững.", "Rễ ở dưới thân cây.", "Rễ bám trong đất.", "🌱"],
+      ["Cây bị gió thổi nghiêng, người lớn có thể giúp thế nào?", "Dựng cây và cố định chậu", "Bẻ thân cây", "Đặt chậu trên mép bàn", "Cố định chậu giúp cây đứng vững hơn.", "Chậu đang bị gió làm nghiêng.", "Nhờ người lớn đặt cây chắc chắn.", "🌬️"],
+      ["Hạt chưa nảy mầm. Bé nên làm gì?", "Chờ và chăm theo hướng dẫn", "Đào hạt lên mỗi ngày", "Bỏ hạt vào tủ lạnh", "Hạt cần thời gian và cách chăm phù hợp để nảy mầm.", "Cây không lớn lên ngay lập tức.", "Chờ thêm và nhờ người lớn hướng dẫn.", "⏳"],
+      ["Hai cây cùng loại, một cây thiếu nắng. Cây nào có thể yếu hơn?", "Cây thiếu ánh sáng", "Cây được chăm phù hợp", "Cả hai chắc chắn như nhau", "Thiếu ánh sáng có thể làm cây phát triển kém.", "Cây cần ánh sáng để lớn.", "Cây ở chỗ tối có thể yếu hơn.", "🌿"],
+      ["Vì sao không nên tưới cây quá nhiều?", "Đất quá ướt có thể làm rễ không khỏe", "Cây sẽ mọc thành cá", "Lá sẽ biến thành đá", "Quá nhiều nước khiến rễ cây không khỏe.", "Rễ cũng cần đất thoáng.", "Đất sũng nước không tốt cho rễ.", "💧"],
+      ["Cây non bị cỏ dại che kín, điều gì có thể xảy ra?", "Cây non khó nhận ánh sáng", "Cây non biết đi", "Cỏ biến thành mưa", "Cỏ che có thể khiến cây non khó nhận ánh sáng.", "Cây nhỏ cần khoảng sáng.", "Cỏ che mất ánh sáng của cây.", "🌱"],
+      ["Một cây có lá xanh và thân đứng thẳng. Cây có vẻ thế nào?", "Đang khỏe", "Đang biến thành đồ chơi", "Đang ngủ trong đất", "Lá xanh và thân vững thường là dấu hiệu cây khỏe.", "Quan sát màu lá và thân cây.", "Cây trông khỏe mạnh.", "🌿"],
+      ["Cây bị sâu ăn lá nhiều. Bé nên làm gì?", "Báo người lớn để chăm cây", "Tự dùng thuốc xịt", "Chạm vào sâu", "Người lớn sẽ chọn cách chăm cây an toàn.", "Không tự dùng hóa chất.", "Gọi người lớn giúp cây.", "🐛"],
+      ["Vì sao không nên bứt hoa ở công viên?", "Để cây tiếp tục lớn và mọi người cùng ngắm", "Vì hoa là đồ chơi", "Để hoa biến thành đá", "Để hoa trên cây giúp cây tiếp tục phát triển và mọi người cùng thưởng thức.", "Hoa đang mọc trong công viên.", "Hãy ngắm hoa, không bứt hoa.", "🌷"],
+      ["Cây bị đặt sát lò sưởi nóng. Bé nên làm gì?", "Báo người lớn chuyển cây ra xa", "Đặt sát hơn", "Phủ khăn kín lên cây", "Nhiệt quá nóng có thể làm cây bị hại.", "Lò sưởi tỏa nhiều nhiệt.", "Nhờ người lớn chuyển cây.", "🔥"],
+      ["Vì sao chậu cây cần có lỗ thoát nước?", "Để nước thừa chảy ra", "Để cây chạy đi", "Để đất bay lên", "Lỗ thoát giúp nước thừa không đọng quá lâu.", "Nước không nên đọng mãi trong chậu.", "Lỗ nhỏ cho nước thừa chảy ra.", "🪴"],
+      ["Cây bị thiếu nước lâu ngày. Lá có thể thế nào?", "Rũ xuống và khô", "Kêu meo meo", "Hóa thành quả bóng", "Thiếu nước có thể khiến lá rũ và khô.", "Cây đang khát.", "Lá có thể héo xuống.", "🍂"],
+      ["Vì sao cần nhẹ tay khi chạm vào cây non?", "Thân cây non còn mềm và dễ gãy", "Cây sẽ cười", "Cây sẽ biến mất", "Cây non còn yếu nên cần được chăm nhẹ nhàng.", "Thân cây nhỏ và mềm.", "Đừng kéo hoặc bóp cây.", "🌱"],
+      ["Bé muốn biết cây có lớn lên không. Bé có thể làm gì?", "Quan sát cây sau vài ngày", "Đoán ngay mà không nhìn", "Nhổ cây lên", "Quan sát theo thời gian giúp thấy cây lớn lên.", "Cây lớn chậm từng chút.", "Nhìn cây hôm nay rồi xem lại sau.", "📏"],
+      ["Một cây cần nước, ánh sáng và đất phù hợp. Bé nên làm gì?", "Chăm cây đều đặn cùng người lớn", "Để cây trong hộp kín", "Tưới nước không ngừng", "Chăm cây đúng cách giúp cây có điều kiện phát triển.", "Cây cần nhiều điều kiện vừa đủ.", "Cùng người lớn chăm cây mỗi ngày.", "🌻"]
+    ]);
+
+    addQuestionRows("animals", 1, [
+      ["Con vật nào kêu “gâu gâu”?", "Chó", "Mèo", "Cá", "Chó thường sủa gâu gâu.", "Con vật này thích vẫy đuôi.", "Chó sủa gâu gâu.", "🐶"],
+      ["Con vật nào kêu “quạc quạc”?", "Vịt", "Mèo", "Thỏ", "Vịt thường kêu quạc quạc.", "Con vật này có mỏ bẹt.", "Vịt kêu quạc quạc.", "🦆"],
+      ["Con nào có chiếc vòi dài?", "Voi", "Gà", "Cá", "Voi có chiếc vòi dài.", "Con vật này rất to.", "Voi dùng chiếc vòi dài.", "🐘"],
+      ["Con nào có bờm quanh đầu?", "Sư tử", "Vịt", "Thỏ", "Sư tử đực thường có bờm.", "Đây là con vật lớn sống ở đồng cỏ.", "Sư tử có bờm.", "🦁"],
+      ["Con nào nhảy bằng đôi chân sau khỏe?", "Ếch", "Cá", "Gà con", "Ếch thường nhảy bằng đôi chân sau.", "Con vật này sống gần ao.", "Ếch nhảy rất giỏi.", "🐸"],
+      ["Con nào có mai cứng?", "Rùa", "Mèo", "Chim", "Rùa có chiếc mai cứng bảo vệ cơ thể.", "Con vật này đi chậm.", "Rùa mang chiếc mai trên lưng.", "🐢"],
+      ["Con nào có cổ rất dài?", "Hươu cao cổ", "Vịt", "Thỏ", "Hươu cao cổ có chiếc cổ dài.", "Con vật này ăn lá trên cao.", "Cổ của nó rất dài.", "🦒"],
+      ["Con nào có cánh nhiều màu và bay từ hoa này sang hoa khác?", "Bướm", "Cá", "Chó", "Bướm có đôi cánh đẹp và thường bay quanh hoa.", "Con vật này bắt đầu từ sâu.", "Bướm có cánh nhiều màu.", "🦋"],
+      ["Con nào có tám chân?", "Nhện", "Gà", "Thỏ", "Nhện có tám chiếc chân.", "Con vật nhỏ này có thể giăng tơ.", "Đếm chân của nhện nhé.", "🕷️"],
+      ["Con nào sống trong tổ và tạo mật?", "Ong", "Cá", "Mèo", "Ong sống theo đàn và làm mật.", "Con vật này bay quanh hoa.", "Ong làm mật trong tổ.", "🐝"],
+      ["Con nào có lông mềm và kêu “chiếp chiếp”?", "Gà con", "Cá voi", "Voi", "Gà con có lông tơ và tiếng kêu nhỏ.", "Gà con mới nở rất bé.", "Gà con kêu chiếp chiếp.", "🐥"],
+      ["Con nào bơi bằng vây?", "Cá", "Chim", "Mèo", "Cá dùng vây để bơi trong nước.", "Con vật này có mang.", "Cá bơi bằng vây.", "🐠"],
+      ["Con nào có tai dài và thích nhảy?", "Thỏ", "Vịt", "Cá", "Thỏ có đôi tai dài và chân sau khỏe.", "Con vật này thích ăn rau.", "Thỏ có tai dài.", "🐇"],
+      ["Con nào thường sống trong chuồng và gáy sáng sớm?", "Gà trống", "Cá", "Mèo con", "Gà trống thường gáy vào buổi sáng.", "Con vật này có mào.", "Gà trống gáy ò ó o.", "🐓"],
+      ["Con nào sống dưới biển và rất to?", "Cá voi", "Thỏ", "Gà", "Cá voi là động vật lớn sống ở biển.", "Con vật này thở bằng phổi.", "Cá voi sống dưới biển.", "🐋"],
+      ["Con nào có túi trước bụng để mang con?", "Kangaroo", "Vịt", "Cá", "Kangaroo mẹ có chiếc túi để mang con.", "Con vật này nhảy bằng chân sau.", "Đó là kangaroo.", "🦘"],
+      ["Con nào có chiếc vòi nhỏ và thích ăn phô mai trong truyện?", "Chuột", "Voi", "Rùa", "Chuột là con vật nhỏ có ria mép.", "Con vật nhỏ này hay sống trong hang.", "Chuột có ria mép.", "🐭"]
+    ]);
+    addQuestionRows("animals", 2, [
+      ["Thú cưng cần nước uống sạch. Bé nên làm gì?", "Nhờ người lớn thay nước", "Cho uống nước biển", "Đổ nước bẩn vào bát", "Người lớn giúp cho thú cưng nước sạch.", "Thú cưng cũng cần nước sạch.", "Hỏi người lớn thay nước nhé.", "🥣"],
+      ["Bé gặp một chú chó đang ăn. Bé nên làm gì?", "Đứng yên và hỏi người lớn", "Giật bát thức ăn", "Ôm chó từ phía sau", "Không làm phiền chó đang ăn; hỏi người lớn cách an toàn.", "Chó có thể giật mình khi ăn.", "Đứng xa và hỏi người lớn.", "🐕"],
+      ["Cá trong bể cần môi trường nào?", "Nước sạch phù hợp", "Nước ngọt có ga", "Sữa", "Cá cần nước sạch trong bể phù hợp.", "Cá sống dưới nước.", "Giữ bể cá sạch cùng người lớn.", "🐠"],
+      ["Bé thấy chim non rơi khỏi tổ. Bé nên làm gì?", "Báo người lớn", "Tự trèo lên cây", "Mang chim đi chơi", "Người lớn sẽ quyết định cách giúp chim an toàn.", "Chim non cần được chăm đúng cách.", "Gọi người lớn giúp nhé.", "🐦"],
+      ["Con rùa cần nơi nào để nghỉ?", "Nơi ở phù hợp do người lớn chuẩn bị", "Trong hộp kín", "Trên bếp nóng", "Người lớn chuẩn bị nơi ở phù hợp cho rùa.", "Rùa cần được chăm đúng cách.", "Hỏi người lớn về chỗ ở của rùa.", "🐢"],
+      ["Bé muốn cho thỏ ăn. Bé nên làm gì?", "Hỏi người lớn thức ăn phù hợp", "Cho ăn kẹo", "Cho ăn đồ cay", "Thỏ cần thức ăn phù hợp do người lớn hướng dẫn.", "Không phải món ăn nào cũng tốt cho thỏ.", "Hỏi người lớn trước nhé.", "🐰"],
+      ["Chó đi lạc đến gần bé. Bé nên làm gì?", "Giữ khoảng cách và gọi người lớn", "Chạy đuổi theo", "Túm lấy đuôi chó", "Giữ khoảng cách giúp bé an toàn; gọi người lớn hỗ trợ.", "Bé chưa biết chú chó.", "Đứng xa và gọi người lớn.", "🧑‍🧒"],
+      ["Bé nghe tiếng mèo kêu dưới gầm xe. Bé nên làm gì?", "Báo người lớn", "Chui vào gầm xe", "Kéo mèo ra", "Người lớn có thể kiểm tra an toàn giúp mèo.", "Gầm xe không an toàn.", "Đừng chui xuống, gọi người lớn.", "🚗"],
+      ["Bé thấy tổ ong gần cửa. Bé nên làm gì?", "Tránh xa và báo người lớn", "Chọc vào tổ", "Đập tổ ong", "Tránh xa tổ ong và nhờ người lớn xử lý.", "Ong có thể đốt khi bị làm phiền.", "Đứng xa và gọi người lớn.", "🐝"],
+      ["Thú cưng bị thương ở chân. Bé nên làm gì?", "Báo người lớn ngay", "Tự băng thật chặt", "Bắt thú cưng chạy", "Người lớn sẽ đưa thú cưng đi chăm sóc phù hợp.", "Con vật có thể đang đau.", "Nói với người lớn ngay nhé.", "🐾"],
+      ["Bé chơi với chó xong, cần làm gì?", "Rửa tay sạch", "Cho tay vào miệng", "Lau tay lên đồ ăn", "Rửa tay sau khi chơi với động vật giúp giữ vệ sinh.", "Tay có thể dính bụi bẩn.", "Rửa tay bằng xà phòng.", "🧼"],
+      ["Bé muốn vuốt ve mèo nhà bạn. Bé nên làm gì?", "Hỏi chủ mèo và người lớn trước", "Kéo tai mèo", "Đuổi theo mèo", "Hỏi trước giúp tôn trọng con vật và giữ an toàn.", "Mèo có thể không muốn được chạm.", "Hỏi người lớn trước nhé.", "🐈"],
+      ["Chim bay vào phòng. Bé nên làm gì?", "Báo người lớn và đứng yên", "Ném đồ vào chim", "Cầm cánh chim", "Người lớn có thể mở lối ra an toàn cho chim.", "Chim có thể hoảng sợ.", "Gọi người lớn giúp.", "🕊️"],
+      ["Bé thấy cá nổi lên mặt nước, nên làm gì?", "Báo người lớn kiểm tra bể", "Đổ thức ăn thật nhiều", "Gõ mạnh vào kính", "Người lớn cần kiểm tra bể cá và nước.", "Cá có vẻ khác thường.", "Gọi người lớn nhé.", "🐟"],
+      ["Vì sao không nên kéo đuôi mèo?", "Mèo có thể đau và sợ", "Đuôi là đồ chơi", "Mèo sẽ biến thành chim", "Kéo đuôi làm mèo đau và sợ.", "Hãy đối xử nhẹ nhàng với vật nuôi.", "Không kéo đuôi mèo.", "🐈"],
+      ["Bé thấy đàn vịt đang qua đường. Bé nên làm gì?", "Đi cùng người lớn và chờ an toàn", "Chạy ra giữa đường", "Đuổi vịt", "Người lớn sẽ giúp bé qua đường an toàn.", "Đường có xe cộ nguy hiểm.", "Chờ người lớn nhé.", "🦆"],
+      ["Con vật lạ đang ngủ, bé nên làm gì?", "Để con vật nghỉ ngơi", "Lay thật mạnh", "La hét bên cạnh", "Không làm phiền con vật đang ngủ giúp nó được nghỉ.", "Con vật cần yên tĩnh.", "Để bạn ấy ngủ nhé.", "😴"]
+    ]);
+    addQuestionRows("animals", 3, [
+      ["Bé thấy chó không có người trông ở công viên. Làm gì an toàn nhất?", "Báo người lớn, không tự đến gần", "Tự ôm chó", "Cho chó ăn bằng tay", "Người lớn sẽ giúp xem chú chó có cần hỗ trợ không.", "Bé chưa biết chú chó.", "Đứng xa và báo người lớn.", "🧑‍🧒"],
+      ["Một con vật đang gầm gừ. Bé nên làm gì?", "Lùi lại từ từ và gọi người lớn", "Chạy đến vuốt ve", "Nhìn sát vào mặt con vật", "Giữ khoảng cách và nhờ người lớn giúp.", "Con vật có thể đang sợ hoặc khó chịu.", "Lùi lại và gọi người lớn.", "⚠️"],
+      ["Vì sao không nên cho thú cưng ăn thức ăn của người khi chưa hỏi?", "Một số món có thể không tốt cho con vật", "Con vật không bao giờ đói", "Thức ăn sẽ biến thành đồ chơi", "Người lớn biết loại thức ăn phù hợp với thú cưng.", "Mỗi con vật cần thức ăn riêng.", "Hỏi người lớn trước khi cho ăn.", "🥣"],
+      ["Bé thấy con vật hoang dã trong rừng. Bé nên làm gì?", "Quan sát từ xa cùng người lớn", "Bắt con vật", "Đưa con vật về nhà", "Động vật hoang dã cần được sống trong môi trường tự nhiên.", "Không chạm vào con vật lạ.", "Đứng xa và đi cùng người lớn.", "🌳"],
+      ["Chó đang sủa lớn phía sau hàng rào. Bé nên làm gì?", "Không thò tay qua hàng rào", "Đưa tay vào vuốt chó", "Mở cổng một mình", "Hàng rào giúp giữ khoảng cách an toàn.", "Chó có thể giật mình.", "Đứng ngoài hàng rào.", "🐕"],
+      ["Bé muốn giúp chim bị mắc dây. Bé nên làm gì?", "Gọi người lớn giúp", "Tự kéo dây", "Leo lên mái nhà", "Người lớn có thể gỡ dây an toàn hơn.", "Dây có thể làm chim đau.", "Đừng tự trèo, hãy gọi người lớn.", "🕊️"],
+      ["Một con vật đang chăm con non. Bé nên làm gì?", "Quan sát từ xa, không đến gần", "Chạm vào con non", "Mang con non đi", "Giữ khoảng cách để con vật được chăm con.", "Con vật mẹ có thể bảo vệ con.", "Ngắm từ xa nhé.", "🐣"],
+      ["Bé thấy bướm đậu trên hoa. Bé nên làm gì?", "Ngắm nhẹ nhàng, không bắt bướm", "Bắt cánh bướm", "Đập vào bông hoa", "Bướm cần đôi cánh nguyên vẹn để bay.", "Cánh bướm rất mỏng manh.", "Chỉ ngắm thôi nhé.", "🦋"],
+      ["Vì sao cần rửa tay sau khi chạm vào thú cưng?", "Để giữ tay sạch sẽ", "Để tay có mùi thức ăn", "Để làm thú cưng bay", "Rửa tay giúp loại bỏ bụi bẩn và vi khuẩn.", "Tay vừa tiếp xúc với con vật.", "Rửa tay bằng xà phòng.", "🧼"],
+      ["Bé phát hiện tổ kiến trên đường đi. Bé nên làm gì?", "Đi vòng nhẹ nhàng", "Giẫm lên tổ", "Đổ nước vào tổ", "Đi vòng giúp không làm hại đàn kiến.", "Kiến đang sống trong tổ.", "Tránh bước lên tổ nhé.", "🐜"],
+      ["Chim có cánh nhưng không phải con nào cũng bay. Bé nên nhớ gì?", "Mỗi loài vật có cách sống riêng", "Tất cả chim đều bơi", "Chim không cần ăn", "Các loài vật có đặc điểm và cách sống khác nhau.", "Hãy quan sát từng con vật.", "Mỗi loài có điều đặc biệt.", "🐧"],
+      ["Bé gặp con vật bị mắc kẹt trong bụi cây. Làm gì tốt nhất?", "Báo người lớn để giúp an toàn", "Túm lấy con vật", "Chọc cành cây vào", "Người lớn có thể giúp con vật mà không làm bé bị thương.", "Con vật có thể hoảng sợ.", "Gọi người lớn giúp nhé.", "🌿"],
+      ["Vì sao không nên đánh thức thú cưng bằng cách kéo tai?", "Có thể làm con vật đau và giật mình", "Tai là đồ chơi", "Con vật sẽ hát", "Chạm mạnh có thể khiến thú cưng đau hoặc sợ.", "Hãy để bạn ấy ngủ yên.", "Không kéo tai nhé.", "🐶"],
+      ["Bé thấy bát nước của chó bị bẩn. Bé nên làm gì?", "Nhờ người lớn thay nước sạch", "Cho thêm đất vào", "Đổ nước bẩn cho chó uống", "Người lớn sẽ thay nước sạch cho chó.", "Chó cần nước uống sạch.", "Hỏi người lớn giúp thay nước.", "💧"],
+      ["Bé muốn nhìn tổ chim trên cây cao. Bé nên làm gì?", "Ngắm từ dưới đất cùng người lớn", "Tự trèo lên cây", "Ném đá vào tổ", "Ngắm từ dưới đất an toàn và không làm phiền chim.", "Cây cao có thể nguy hiểm.", "Không trèo cây nhé.", "🌳"],
+      ["Vì sao nên giữ yên lặng gần động vật đang nghỉ?", "Để con vật không bị giật mình", "Để con vật thức dậy ngay", "Để con vật đổi màu", "Tiếng ồn có thể làm con vật sợ.", "Con vật đang cần nghỉ.", "Nói khẽ hoặc đi nhẹ nhàng.", "🤫"],
+      ["Bé thấy một con vật có vẻ bị bệnh. Bé nên làm gì?", "Báo người lớn, không chạm vào", "Bế con vật lên", "Cho con vật uống thuốc", "Người lớn sẽ tìm cách chăm sóc phù hợp.", "Không tự cho con vật uống thuốc.", "Gọi người lớn nhé.", "🐾"]
+    ]);
+
+    addQuestionRows("senses", 1, [
+      ["Bé dùng gì để nhìn màu đỏ?", "Mắt", "Tai", "Mũi", "Mắt giúp bé nhìn màu sắc.", "Bé nhìn bằng đôi gì?", "Đó là đôi mắt.", "👀"],
+      ["Bé dùng gì để ngửi mùi bánh?", "Mũi", "Tai", "Bàn tay", "Mũi giúp bé ngửi mùi.", "Bộ phận ở giữa khuôn mặt.", "Bé hít thở bằng mũi.", "👃"],
+      ["Bé nghe tiếng nhạc bằng gì?", "Tai", "Mắt", "Mũi", "Tai giúp bé nghe âm thanh.", "Hai bộ phận ở hai bên đầu.", "Đó là đôi tai.", "👂"],
+      ["Bé nhìn thấy đèn sáng bằng gì?", "Mắt", "Lưỡi", "Đầu gối", "Mắt giúp bé nhìn thấy ánh sáng.", "Hãy chớp mắt nhé.", "Mắt nhìn thấy đèn.", "💡"],
+      ["Bé nếm vị chua bằng gì?", "Lưỡi", "Tai", "Tóc", "Lưỡi giúp bé cảm nhận vị.", "Bộ phận nằm trong miệng.", "Bé dùng lưỡi để nếm.", "👅"],
+      ["Bàn tay giúp bé cảm nhận điều gì?", "Mềm hay cứng", "Âm thanh", "Màu sắc", "Bàn tay giúp bé cảm nhận bề mặt đồ vật.", "Bé chạm nhẹ vào vật.", "Tay cảm nhận mềm hay cứng.", "✋"],
+      ["Bé dùng gì để nghe tiếng mưa rơi?", "Tai", "Mắt", "Lưỡi", "Tai nghe tiếng mưa rơi tí tách.", "Hãy lắng nghe âm thanh.", "Đôi tai giúp bé nghe.", "🌧️"],
+      ["Bé ngửi thấy hương cam bằng gì?", "Mũi", "Tai", "Chân", "Mũi giúp bé ngửi hương cam.", "Hãy hít thở nhẹ nhàng.", "Ngửi bằng mũi nhé.", "🍊"],
+      ["Bé thấy con bướm nhiều màu bằng gì?", "Mắt", "Tai", "Mũi", "Mắt giúp bé nhìn thấy con bướm.", "Bé quan sát bằng gì?", "Đôi mắt nhìn thấy bướm.", "🦋"],
+      ["Bé nghe tiếng vỗ tay bằng gì?", "Tai", "Mắt", "Mũi", "Tai giúp bé nghe tiếng vỗ tay.", "Hãy lắng nghe tiếng bố mẹ.", "Bé nghe bằng tai.", "👏"],
+      ["Bé cảm nhận nước ấm bằng gì khi người lớn cho phép?", "Bàn tay", "Tai", "Mắt", "Da ở tay cảm nhận được nước ấm.", "Chạm nhẹ khi có người lớn đồng ý.", "Bàn tay cảm nhận độ ấm.", "💧"],
+      ["Bé nhìn thấy chiếc xe màu xanh bằng gì?", "Mắt", "Tai", "Lưỡi", "Mắt giúp bé thấy màu xanh của xe.", "Bé hãy quan sát chiếc xe.", "Mắt nhìn thấy màu sắc.", "🚙"],
+      ["Bé ngửi mùi xà phòng thơm bằng gì?", "Mũi", "Tai", "Bàn chân", "Mũi giúp bé ngửi mùi thơm.", "Bộ phận này ở giữa mặt.", "Mũi ngửi mùi xà phòng.", "🧼"],
+      ["Bé nghe tiếng chim hót bằng gì?", "Tai", "Mắt", "Mũi", "Tai nghe tiếng chim hót líu lo.", "Hãy lắng nghe trên cành cây.", "Bé nghe bằng tai.", "🐦"],
+      ["Bé cảm nhận chiếc khăn mềm bằng gì?", "Da ở bàn tay", "Tai", "Mắt", "Da ở bàn tay cảm nhận được khăn mềm.", "Chạm nhẹ vào khăn.", "Bàn tay cảm nhận được.", "🧣"],
+      ["Bé nếm vị ngọt của dưa hấu bằng gì?", "Lưỡi", "Tai", "Mắt", "Lưỡi giúp bé cảm nhận vị ngọt.", "Chỉ ăn khi người lớn cho phép.", "Bé nếm bằng lưỡi.", "🍉"],
+      ["Bé nhìn thấy ánh trăng bằng gì?", "Mắt", "Tai", "Mũi", "Mắt giúp bé nhìn thấy Mặt Trăng.", "Hãy ngắm bầu trời buổi tối.", "Mắt nhìn thấy ánh trăng.", "🌙"]
+    ]);
+    addQuestionRows("senses", 2, [
+      ["Bé nghe tiếng gọi từ phía sau. Bé nên làm gì?", "Quay lại nhìn", "Bịt mắt", "Ngửi chiếc ghế", "Bé có thể quay lại để xem ai đang gọi.", "Bé nghe tiếng bằng tai.", "Quay lại quan sát nhé.", "👂"],
+      ["Bé muốn biết áo len mềm hay ráp. Bé có thể làm gì?", "Chạm nhẹ vào áo", "Nếm áo", "Nghe áo", "Bàn tay cảm nhận được bề mặt áo.", "Chỉ chạm khi áo sạch và được phép.", "Dùng tay sờ nhẹ.", "🧶"],
+      ["Bé ngửi thấy mùi khét trong bếp. Bé nên làm gì?", "Báo người lớn ngay", "Tự mở bếp", "Chạm vào nồi", "Báo người lớn để kiểm tra an toàn.", "Mùi lạ có thể cần người lớn xử lý.", "Gọi người lớn ngay nhé.", "⚠️"],
+      ["Bé thấy đèn giao thông đỏ. Bé nên làm gì?", "Dừng lại cùng người lớn", "Chạy qua đường", "Nhắm mắt đi", "Đèn đỏ báo cần dừng và chờ người lớn.", "Hãy nhìn màu đèn.", "Đỏ nghĩa là dừng.", "🚦"],
+      ["Bé nghe âm thanh quá to. Bé nên làm gì?", "Bịt tai và báo người lớn", "Đứng sát loa", "Bật to hơn", "Bịt tai và rời xa âm thanh lớn cùng người lớn.", "Âm thanh quá lớn có thể làm tai khó chịu.", "Che tai và gọi người lớn.", "🔊"],
+      ["Bé muốn biết súp có nóng không. Bé nên làm gì?", "Hỏi người lớn", "Nếm ngay", "Chạm vào nồi", "Người lớn sẽ kiểm tra món ăn nóng giúp bé.", "Món ăn có thể làm bỏng.", "Đừng tự nếm, hãy hỏi người lớn.", "🍲"],
+      ["Bé ngửi thấy hoa thơm ở vườn. Bé nên làm gì?", "Ngửi nhẹ nhàng từ xa", "Ăn thử cánh hoa", "Bẻ cả bông hoa", "Bé có thể ngắm và ngửi hoa nhẹ nhàng.", "Không phải hoa nào cũng ăn được.", "Chỉ ngửi, không ăn hoa.", "🌼"],
+      ["Bé đeo kính nhưng vẫn nhìn mờ. Bé nên làm gì?", "Nói với người lớn", "Tự tháo kính của bạn", "Nhắm mắt đi tiếp", "Người lớn có thể giúp kiểm tra kính.", "Bé cần nhìn rõ.", "Báo người lớn nhé.", "👓"],
+      ["Bé bị bụi bay vào mắt. Bé nên làm gì?", "Báo người lớn, không dụi mạnh", "Dụi mắt thật mạnh", "Chọc tay vào mắt", "Người lớn sẽ giúp rửa mắt an toàn.", "Mắt rất nhạy cảm.", "Đừng dụi mạnh, gọi người lớn.", "👀"],
+      ["Bé nếm món ăn lạ được người lớn đưa. Vị chua là cảm nhận của gì?", "Lưỡi", "Tai", "Tóc", "Lưỡi cảm nhận vị chua của thức ăn.", "Bộ phận ở trong miệng.", "Lưỡi nếm vị.", "🍋"],
+      ["Bé nghe chuông cửa nhưng không biết ai đến. Bé nên làm gì?", "Báo người lớn", "Tự mở cửa", "Nhìn qua khe cửa một mình", "Người lớn sẽ kiểm tra cửa an toàn.", "Bé nghe tiếng chuông.", "Gọi người lớn nhé.", "🔔"],
+      ["Bé chạm vào vật quá nóng. Bé nên làm gì?", "Rút tay ra và báo người lớn", "Chạm tiếp", "Đắp khăn lên vật nóng", "Rời khỏi vật nóng và gọi người lớn ngay.", "Nóng có thể làm bỏng.", "Báo người lớn ngay nhé.", "🔥"],
+      ["Bé ngửi thấy mùi nước hoa mạnh. Bé thấy khó chịu, nên làm gì?", "Đi ra nơi thoáng và báo người lớn", "Ngửi thật lâu", "Xịt thêm nước hoa", "Rời khỏi mùi mạnh và nói với người lớn.", "Mùi mạnh làm bé khó chịu.", "Ra nơi thoáng nhé.", "🌬️"],
+      ["Bé muốn nhìn tranh trong phòng tối. Bé cần gì?", "Bật đèn cùng người lớn", "Nhắm mắt", "Tắt hết đèn", "Ánh sáng giúp bé nhìn tranh rõ hơn.", "Phòng đang tối.", "Nhờ người lớn bật đèn.", "💡"],
+      ["Bé chạm vào đồ vật có cạnh sắc. Bé nên làm gì?", "Đặt xuống và báo người lớn", "Cầm chạy đi", "Chạm thử nhiều lần", "Đồ vật sắc có thể làm bị thương.", "Cạnh sắc không an toàn.", "Đặt xuống nhẹ nhàng, gọi người lớn.", "⚠️"],
+      ["Bé nghe tiếng sấm lớn ngoài trời. Bé nên làm gì?", "Vào nhà cùng người lớn", "Đứng ngoài sân", "Trốn dưới cây", "Vào trong nhà cùng người lớn khi có giông.", "Sấm báo hiệu trời giông.", "Đi vào nhà nhé.", "⛈️"],
+      ["Bé muốn sờ một vật lạ trên đường. Bé nên làm gì?", "Hỏi người lớn trước", "Cho vào miệng", "Cầm lên ngay", "Người lớn sẽ xem vật đó có an toàn không.", "Bé chưa biết vật đó là gì.", "Hỏi người lớn nhé.", "❓"]
+    ]);
+    addQuestionRows("senses", 3, [
+      ["Bé nghe tiếng còi xe khi đi bộ. Bé nên làm gì?", "Nắm tay người lớn và đứng nơi an toàn", "Chạy ra đường", "Bịt mắt chạy", "Đi cùng người lớn và đứng xa xe cộ.", "Âm thanh báo xe đang đến.", "Nắm tay người lớn nhé.", "🚗"],
+      ["Bé thấy một vật sáng chói trên trời. Bé nên làm gì?", "Không nhìn thẳng vào Mặt Trời", "Nhìn thật lâu", "Dùng kính đồ chơi nhìn", "Nhìn thẳng vào Mặt Trời có thể làm hại mắt.", "Ánh sáng rất mạnh.", "Hãy nhìn sang chỗ khác.", "☀️"],
+      ["Bé ngửi thấy mùi khói trong nhà. Điều gì nên làm trước?", "Báo người lớn và đi đến nơi an toàn", "Trốn vào tủ", "Tự tìm nguồn khói", "Người lớn sẽ giúp bé rời đến nơi an toàn.", "Khói có thể nguy hiểm.", "Gọi người lớn ngay.", "🚨"],
+      ["Bé nghe tiếng báo động ở trường. Bé nên làm gì?", "Nghe cô giáo và đi theo hướng dẫn", "Chạy tán loạn", "Trốn một mình", "Làm theo hướng dẫn của cô giáo giúp mọi người an toàn.", "Người lớn ở trường sẽ hướng dẫn.", "Đi theo cô giáo.", "🏫"],
+      ["Bé sờ thấy nước rất nóng trong bồn. Bé nên làm gì?", "Không chạm tiếp và báo người lớn", "Ngồi vào ngay", "Nếm nước", "Nước nóng có thể làm bỏng; hãy báo người lớn.", "Nước quá nóng không an toàn.", "Lùi ra và gọi người lớn.", "♨️"],
+      ["Bé nhìn thấy một chai không có nhãn. Bé nên làm gì?", "Không chạm, báo người lớn", "Ngửi thử", "Nếm thử", "Không rõ chất bên trong nên không được chạm hoặc nếm.", "Bé không biết chai đựng gì.", "Gọi người lớn.", "⚠️"],
+      ["Bé nghe tiếng bạn khóc. Bé có thể làm gì?", "Hỏi bạn có cần cô giáo giúp không", "La to hơn", "Bỏ chạy", "Bé có thể nhẹ nhàng hỏi bạn và nhờ cô giáo giúp.", "Lắng nghe cảm xúc của bạn.", "Hỏi cô giáo nếu bạn cần giúp.", "🤝"],
+      ["Bé thấy đồ chơi nhỏ có thể nuốt được. Bé nên làm gì?", "Báo người lớn, không cho vào miệng", "Nếm thử", "Ngậm đồ chơi", "Đồ vật nhỏ có thể gây hóc.", "Đồ chơi không phải thức ăn.", "Không cho vào miệng nhé.", "🧸"],
+      ["Bé ngửi thấy mùi thức ăn đã ôi. Bé nên làm gì?", "Không ăn và báo người lớn", "Ăn thử một miếng", "Cho bạn ăn", "Thức ăn có mùi lạ có thể không an toàn.", "Mùi thức ăn khác thường.", "Báo người lớn, không ăn.", "🤢"],
+      ["Bé cảm thấy đau khi chạm vào đồ vật. Bé nên làm gì?", "Dừng lại và nói với người lớn", "Chạm tiếp", "Giấu đi", "Người lớn cần biết để giúp bé.", "Cơ thể đang báo có điều không ổn.", "Nói với người lớn nhé.", "🩹"],
+      ["Bé nghe tiếng gọi khi đang ở nơi đông người. Bé nên làm gì?", "Ở cạnh người lớn đi cùng", "Đi theo người lạ", "Chạy ra xa", "Ở gần người thân giúp bé an toàn.", "Không tự đi theo người lạ.", "Nắm tay người lớn nhé.", "🧑‍🧒"],
+      ["Bé thấy dây điện bị hở. Bé nên làm gì?", "Đứng xa và báo người lớn", "Chạm tay vào", "Dùng đồ chơi gạt dây", "Dây điện hở rất nguy hiểm; cần người lớn xử lý.", "Không chạm vào dây điện.", "Đứng xa và gọi người lớn.", "⚡"],
+      ["Bé nghe âm thanh lạ trong đêm và sợ. Bé nên làm gì?", "Gọi người lớn ở gần", "Tự ra ngoài tìm", "Trốn ra khỏi nhà", "Người lớn sẽ giúp bé kiểm tra và yên tâm.", "Bé không cần tự đi tìm.", "Gọi người thân nhé.", "🌙"],
+      ["Bé bị xà phòng bắn vào mắt. Bé nên làm gì?", "Báo người lớn ngay", "Dụi mắt mạnh", "Tiếp tục chơi", "Người lớn sẽ giúp rửa mắt đúng cách.", "Mắt đang khó chịu.", "Gọi người lớn nhé.", "🧼"],
+      ["Bé nhìn thấy vật nhọn dưới sàn. Bé nên làm gì?", "Tránh xa và báo người lớn", "Nhặt lên chơi", "Đá vật đó", "Người lớn sẽ dọn vật nhọn an toàn.", "Vật nhọn có thể làm đau.", "Đừng chạm vào.", "⚠️"],
+      ["Bé nếm thức ăn và thấy vị lạ, khó chịu. Bé nên làm gì?", "Dừng ăn và nói với người lớn", "Ăn thêm", "Cho em bé ăn", "Người lớn sẽ kiểm tra món ăn.", "Hương vị khác thường.", "Dừng lại và báo người lớn.", "🍽️"],
+      ["Bé thấy nước đổ trên sàn. Bé nên làm gì?", "Báo người lớn để lau khô", "Chạy qua thật nhanh", "Trượt chơi trên đó", "Sàn ướt dễ trượt; người lớn giúp lau khô.", "Nước làm sàn trơn.", "Báo người lớn nhé.", "💧"]
+    ]);
+
+    addQuestionRows("weather", 1, [
+      ["Trời có mây trắng và nắng. Bé có thể thấy gì trên trời?", "Mặt Trời", "Mặt Trăng giữa trưa", "Đèn trong nhà", "Trời nắng có thể nhìn thấy Mặt Trời.", "Ánh sáng chiếu từ trên cao.", "Đó là Mặt Trời.", "☀️"],
+      ["Khi trời mưa, từ trên trời rơi xuống gì?", "Những giọt nước", "Lá khô", "Kẹo", "Mưa là những giọt nước rơi xuống.", "Nghe tiếng tí tách trên mái.", "Đó là nước mưa.", "🌧️"],
+      ["Trời có gió, lá cây thường thế nào?", "Lay động", "Kêu meo meo", "Biến thành cá", "Gió làm lá cây lay động.", "Không khí đang thổi.", "Lá rung theo gió.", "🍃"],
+      ["Bé thấy gió lạnh trên đường về. Bé nên khoác gì?", "Áo ấm", "Đồ bơi", "Áo mưa mỏng", "Áo ấm giúp bé đỡ lạnh.", "Chọn áo dày hơn.", "Mặc áo ấm nhé.", "🧥"],
+      ["Trời nắng, bé che đầu bằng gì?", "Mũ", "Ủng", "Găng tay", "Mũ giúp che đầu khi trời nắng.", "Vật này đội lên đầu.", "Đội mũ nhé.", "🧢"],
+      ["Khi trời mưa, bé đi chân nào để tránh ướt?", "Ủng đi mưa", "Dép ngủ", "Giày giấy", "Ủng giúp chân bé đỡ ướt khi đi mưa.", "Vật này cao đến mắt cá.", "Đó là ủng đi mưa.", "🥾"],
+      ["Trời nhiều mây, bầu trời trông thế nào?", "Có nhiều đám mây", "Đầy cá", "Có mái nhà", "Mây tạo thành những đám trên bầu trời.", "Hãy ngước nhìn lên.", "Bầu trời có nhiều mây.", "☁️"],
+      ["Sau mưa, đôi khi bé thấy gì có nhiều màu?", "Cầu vồng", "Cầu thang", "Cái ô", "Cầu vồng có thể xuất hiện sau mưa khi có nắng.", "Vật này cong trên trời.", "Đó là cầu vồng.", "🌈"],
+      ["Trời nóng, bé cần uống gì?", "Nước sạch", "Nước biển", "Nước trong bình xịt", "Nước sạch giúp bé giải khát.", "Cơ thể cần nước.", "Uống nước sạch nhé.", "💧"],
+      ["Trời mưa, bé cầm gì để che đầu?", "Ô", "Quạt", "Kính bơi", "Ô giúp che mưa cho bé.", "Vật này mở ra phía trên đầu.", "Đó là chiếc ô.", "☂️"],
+      ["Trời lạnh, bé có thể đeo gì cho ấm tay?", "Găng tay", "Kính râm", "Dép", "Găng tay giúp giữ ấm bàn tay.", "Vật này đeo vào tay.", "Đeo găng tay nhé.", "🧤"],
+      ["Khi có gió nhẹ, chiếc chong chóng làm gì?", "Quay", "Bơi", "Nở hoa", "Gió làm chong chóng quay.", "Không khí đang thổi vào cánh.", "Chong chóng quay theo gió.", "🌀"],
+      ["Mặt Trời thường làm sân chơi thế nào vào buổi trưa?", "Sáng và ấm", "Tối như ban đêm", "Đầy tuyết", "Nắng làm sân sáng và có thể ấm hơn.", "Ánh sáng chiếu xuống sân.", "Sân sáng và ấm.", "🌞"],
+      ["Mưa nhỏ rơi tí tách trên mái nhà. Bé nghe bằng gì?", "Tai", "Mắt", "Mũi", "Tai nghe được tiếng mưa rơi.", "Lắng nghe âm thanh nhé.", "Bé nghe bằng tai.", "👂"],
+      ["Trời mưa, đường có thể thế nào?", "Ướt", "Khô như sa mạc", "Có cát nóng", "Nước mưa làm đường ướt.", "Cẩn thận khi đi bộ.", "Đường ướt sau mưa.", "💦"],
+      ["Ngày nắng, bóng của bé thường xuất hiện ở đâu?", "Trên mặt đất", "Trong tủ", "Dưới nước", "Ánh sáng tạo bóng trên mặt đất.", "Hãy nhìn dưới chân bé.", "Bóng ở trên mặt đất.", "👤"],
+      ["Khi trời tối, bé cần bật gì để nhìn rõ trong nhà?", "Đèn", "Ô", "Áo mưa", "Đèn giúp căn phòng sáng hơn.", "Bấm công tắc cùng người lớn.", "Bật đèn nhé.", "💡"]
+    ]);
+    addQuestionRows("weather", 2, [
+      ["Trời mưa, bé chuẩn bị gì trước khi ra ngoài cùng người lớn?", "Áo mưa hoặc ô", "Kính bơi", "Quạt giấy", "Áo mưa hoặc ô giúp bé đỡ bị ướt.", "Bầu trời đang có mưa.", "Chuẩn bị đồ che mưa.", "🌧️"],
+      ["Trời nắng nóng, bé nên chơi ở đâu?", "Nơi râm mát cùng người lớn", "Trên mái nhà", "Trong xe đóng kín", "Nơi râm mát giúp bé tránh nắng gắt.", "Tìm chỗ có bóng râm.", "Chơi nơi mát nhé.", "🌳"],
+      ["Trời gió lạnh, bé ra ngoài cần gì?", "Áo khoác", "Áo tắm", "Quạt điện", "Áo khoác giúp giữ ấm khi trời lạnh.", "Gió làm bé lạnh hơn.", "Khoác áo ấm nhé.", "🧥"],
+      ["Mây đen kéo đến và gió mạnh. Bé nên làm gì?", "Vào nhà cùng người lớn", "Ra sân thả diều", "Đứng dưới cây", "Vào nhà giúp bé tránh thời tiết xấu.", "Trời có thể sắp mưa giông.", "Đi vào nhà nhé.", "⛈️"],
+      ["Trời nắng gắt, bé cần bảo vệ mắt thế nào?", "Đội mũ và tránh nhìn thẳng vào nắng", "Nhìn thẳng lên Mặt Trời", "Bỏ kính của người khác", "Đội mũ và không nhìn thẳng vào Mặt Trời.", "Ánh sáng có thể chói.", "Che nắng, nhìn chỗ khác.", "🧢"],
+      ["Trời mưa làm đường trơn. Bé nên đi thế nào?", "Đi chậm cùng người lớn", "Chạy thật nhanh", "Nhảy trên vũng nước sâu", "Đi chậm và nắm tay người lớn giúp an toàn.", "Đường ướt dễ trượt.", "Bước cẩn thận nhé.", "👣"],
+      ["Bé nghe sấm khi đang ngoài sân. Bé nên làm gì?", "Vào trong nhà cùng người lớn", "Trốn dưới cây cao", "Cầm ô kim loại chạy", "Vào nhà cùng người lớn khi có sấm.", "Giông có thể nguy hiểm.", "Đi vào nhà ngay.", "⛈️"],
+      ["Trời rất nóng, bé chơi ngoài trời thấy mệt. Bé nên làm gì?", "Vào chỗ mát và báo người lớn", "Chạy thêm", "Cởi hết quần áo", "Nghỉ ở chỗ mát và báo người lớn.", "Cơ thể đang cần nghỉ.", "Tìm người lớn giúp nhé.", "🥵"],
+      ["Trời rét, bé thấy run. Bé nên làm gì?", "Mặc thêm áo và báo người lớn", "Cởi áo khoác", "Đứng ngoài gió", "Mặc thêm áo giúp giữ ấm.", "Cơ thể đang bị lạnh.", "Báo người lớn nhé.", "🥶"],
+      ["Mưa to, nước chảy trên đường. Bé nên làm gì?", "Tránh xa chỗ nước chảy, đi cùng người lớn", "Bước xuống dòng nước", "Chơi gần cống", "Nước chảy có thể nguy hiểm; tránh xa và ở cùng người lớn.", "Dòng nước có thể mạnh.", "Đi nơi an toàn nhé.", "🌊"],
+      ["Bé muốn đi bơi khi trời giông. Bé nên làm gì?", "Chờ trời an toàn và có người lớn", "Xuống nước ngay", "Bơi một mình", "Không bơi khi có giông; luôn ở cùng người lớn.", "Sấm chớp gần nước rất nguy hiểm.", "Chờ người lớn cho phép.", "🏊"],
+      ["Sau khi đi mưa, quần áo bé bị ướt. Bé nên làm gì?", "Thay đồ khô cùng người lớn", "Ngồi trong áo ướt", "Phơi đồ lên người", "Thay quần áo khô giúp bé thoải mái hơn.", "Quần áo đang ướt.", "Nhờ người lớn thay đồ.", "👕"],
+      ["Trời có gió lớn, đồ vật nhẹ bay quanh sân. Bé nên làm gì?", "Vào trong nhà cùng người lớn", "Nhặt đồ đang bay", "Đứng gần cây rung mạnh", "Ở trong nhà giúp bé tránh đồ vật bị gió thổi.", "Gió mạnh làm đồ vật bay.", "Vào trong nhà nhé.", "🌬️"],
+      ["Bé thấy tia chớp ngoài trời. Bé nên làm gì?", "Vào nhà và tránh cửa sổ cùng người lớn", "Đứng ngoài chụp ảnh", "Núp dưới cây", "Ở trong nhà và nghe theo người lớn khi có sét.", "Sét rất nguy hiểm.", "Vào nhà ngay nhé.", "⚡"],
+      ["Trời nắng, bé đi dạo lâu. Bé nên làm gì?", "Nghỉ chỗ mát và uống nước", "Không uống nước", "Chạy liên tục", "Nghỉ mát và uống nước giúp bé dễ chịu.", "Cơ thể có thể nóng và khát.", "Nghỉ và uống nước nhé.", "💧"],
+      ["Bé không chắc trời có mưa. Bé nên làm gì trước khi đi?", "Hỏi người lớn xem thời tiết", "Tự đi một mình", "Mang đồ chơi ra đường", "Người lớn giúp bé chuẩn bị phù hợp.", "Hãy hỏi người đi cùng.", "Hỏi người lớn nhé.", "🧑‍🧒"],
+      ["Mưa làm sân có vũng nước sâu. Bé nên làm gì?", "Tránh vũng và đi cùng người lớn", "Nhảy vào vũng sâu", "Chạy quanh vũng", "Tránh vũng sâu giúp bé không bị ngã hoặc ướt.", "Nước có thể che chỗ trũng.", "Đi vòng cùng người lớn.", "💧"]
+    ]);
+    addQuestionRows("weather", 3, [
+      ["Bé đang ở công viên thì trời có sấm chớp. Nơi nào an toàn hơn?", "Vào nhà kiên cố cùng người lớn", "Núp dưới cây cao", "Đứng cạnh cột đèn", "Vào trong nhà cùng người lớn là lựa chọn an toàn hơn.", "Tránh ở ngoài trời khi có sấm.", "Tìm nơi trú trong nhà.", "🏠"],
+      ["Nước mưa ngập che mất mặt đường. Bé nên làm gì?", "Không đi qua, báo người lớn", "Lội thử", "Chạy qua thật nhanh", "Nước ngập có thể che nguy hiểm; không tự đi qua.", "Không nhìn thấy mặt đường.", "Dừng lại và gọi người lớn.", "⚠️"],
+      ["Trời nóng ẩm, bé thấy chóng mặt khi chơi. Bé nên làm gì?", "Dừng chơi, vào chỗ mát và báo người lớn", "Tiếp tục chạy", "Nằm ngoài nắng", "Nghỉ trong chỗ mát và báo người lớn ngay.", "Chóng mặt là dấu hiệu cần nghỉ.", "Gọi người lớn giúp bé.", "🥵"],
+      ["Gió rất mạnh làm cành cây rung lắc. Bé nên đứng ở đâu?", "Trong nhà cùng người lớn", "Dưới cành cây", "Trên mái hiên", "Ở trong nhà tránh cành cây có thể gãy.", "Cành cây đang rung mạnh.", "Vào nhà nhé.", "🌳"],
+      ["Trời lạnh và đường trơn vì mưa. Bé cần làm gì?", "Mặc ấm, đi chậm cùng người lớn", "Chạy nhanh xuống dốc", "Đi một mình", "Mặc ấm và đi cẩn thận cùng người lớn.", "Đường trơn dễ ngã.", "Nắm tay người lớn.", "🧥"],
+      ["Bé thấy nước chảy mạnh gần miệng cống. Bé nên làm gì?", "Đứng xa và báo người lớn", "Đứng sát nhìn xuống", "Thả đồ chơi vào", "Miệng cống và dòng nước có thể nguy hiểm.", "Nước đang chảy mạnh.", "Tránh xa và gọi người lớn.", "🚧"],
+      ["Sét đang đánh gần sân chơi. Bé đang cầm ô, nên làm gì?", "Vào nhà cùng người lớn, không đứng ngoài", "Đứng dưới cây", "Giơ ô lên cao", "Vào nhà ngay khi có sét.", "Ô không bảo vệ bé khỏi sét.", "Đi vào trong nhà.", "⚡"],
+      ["Một ngày nắng nóng, bé cần uống nước thế nào?", "Uống nước sạch khi người lớn cho phép", "Uống nước ở vũng", "Không uống cả ngày", "Uống nước sạch giúp bé bù nước.", "Cơ thể cần nước khi trời nóng.", "Xin người lớn nước sạch.", "💧"],
+      ["Bé đang ở bãi biển thì có cảnh báo thời tiết xấu. Bé nên làm gì?", "Theo người lớn rời khỏi bãi biển", "Tiếp tục xuống nước", "Tách khỏi gia đình", "Làm theo hướng dẫn người lớn để rời nơi nguy hiểm.", "Thời tiết có thể thay đổi nhanh.", "Ở cạnh người lớn.", "🏖️"],
+      ["Mưa lớn làm nước dâng nhanh ở lối đi. Bé nên làm gì?", "Đi đến nơi cao an toàn cùng người lớn", "Đứng xem nước", "Chơi thuyền giấy", "Người lớn sẽ đưa bé đến nơi cao và an toàn.", "Nước đang dâng.", "Đi cùng người lớn đến chỗ cao.", "🌊"],
+      ["Bé thấy bạn định chạy ra ngoài khi trời có sấm. Bé nên làm gì?", "Báo cô giáo hoặc người lớn", "Chạy theo bạn", "Trốn dưới cây cùng bạn", "Người lớn sẽ giúp cả hai vào nơi an toàn.", "Sấm chớp không an toàn ngoài trời.", "Gọi cô giáo giúp nhé.", "🏫"],
+      ["Sau mưa, trời có cầu vồng. Bé muốn ngắm, nên làm gì?", "Ngắm từ nơi an toàn cùng người lớn", "Chạy ra đường", "Leo lên mái nhà", "Có thể ngắm cầu vồng từ nơi an toàn.", "Đừng chạy ra đường.", "Ở cạnh người lớn nhé.", "🌈"],
+      ["Trời lạnh, bé quần áo bị ướt và run. Bé nên làm gì?", "Báo người lớn để thay đồ khô, ấm", "Ngồi ngoài gió", "Cởi thêm áo", "Thay đồ khô và giữ ấm cùng người lớn.", "Bé đang run vì lạnh.", "Gọi người lớn giúp.", "🧣"],
+      ["Bé thấy bạn nhìn thẳng vào Mặt Trời. Bé nên nhắc gì?", "Không nhìn thẳng vào Mặt Trời", "Nhìn lâu hơn", "Dùng kính đồ chơi", "Nhìn thẳng vào Mặt Trời có thể làm hại mắt.", "Ánh sáng rất mạnh.", "Hãy nhìn sang chỗ khác.", "☀️"],
+      ["Cơn giông làm mất điện trong nhà. Bé nên làm gì?", "Ở cạnh người lớn và làm theo hướng dẫn", "Tự thắp nến", "Chạm vào ổ điện", "Người lớn sẽ giúp bé an toàn khi mất điện.", "Không tự dùng lửa hoặc điện.", "Gọi người lớn nhé.", "🔦"],
+      ["Bé không chắc có nên ra ngoài khi trời mưa to. Bé làm gì?", "Hỏi người lớn và chờ hướng dẫn", "Tự chạy ra ngoài", "Đi một mình", "Người lớn quyết định khi nào ra ngoài an toàn.", "Mưa to có thể nguy hiểm.", "Hỏi người lớn nhé.", "🧑‍🧒"],
+      ["Mưa lớn, bé đang ở gần bờ suối. Bé nên làm gì?", "Rời xa bờ suối cùng người lớn", "Xuống nước chơi", "Đứng sát mép nước", "Mưa lớn có thể làm nước suối dâng nhanh.", "Nước có thể chảy mạnh hơn.", "Đi xa bờ suối cùng người lớn.", "🏞️"]
+    ]);
+
+    const levelNames = ["Bé khám phá", "Bé thử nhé", "Bé nhớ giỏi"];
+    const simulations = {
+      plant: {
+        title: "Cây cần gì để lớn khỏe?",
+        description: "Kéo từng thanh để xem ánh sáng, nhiệt độ và nước cùng ảnh hưởng đến cây thế nào.",
+        question: "Thử giảm một yếu tố thật thấp rồi tăng lại. Cây có thay đổi không?",
+        note: "Mô phỏng đơn giản hóa nhu cầu của cây: cây thật khác nhau theo loài, đất, tuổi và môi trường.",
+        controls: [
+          { id: "light", label: "☀️ Ánh sáng", min: 0, max: 100, value: 65, unit: "%" },
+          { id: "temperature", label: "🌡️ Nhiệt độ", min: 0, max: 40, value: 24, unit: "°C" },
+          { id: "water", label: "💧 Nước mỗi ngày", min: 0, max: 100, value: 55, unit: " ml" }
+        ]
+      },
+      water: {
+        title: "Nắng và mây tạo nên mưa",
+        description: "Tăng nắng hoặc làm ấm không khí để thấy nước bốc hơi; làm không khí lạnh để mây ngưng tụ và mưa.",
+        question: "Khi hơi nước gặp không khí lạnh, điều gì xảy ra? Nếu mây có nhiều giọt nước thì sao?",
+        note: "Đây là mô phỏng khái quát: vòng tuần hoàn nước ngoài tự nhiên còn chịu ảnh hưởng của gió, địa hình và độ ẩm.",
+        controls: [
+          { id: "sunlight", label: "☀️ Nắng làm nóng mặt nước", min: 0, max: 100, value: 75, unit: "%" },
+          { id: "airTemp", label: "🌡️ Nhiệt độ không khí", min: 0, max: 40, value: 12, unit: "°C" }
+        ]
+      },
+      energy: {
+        title: "Thắp sáng ngôi làng xanh",
+        description: "Thay đổi nắng, gió và dòng nước. Quan sát tấm pin, tua-bin, bánh xe nước và ánh đèn của làng.",
+        question: "Thử giảm gió nhưng tăng nắng. Nguồn năng lượng phù hợp nhất có thay đổi không?",
+        note: "Mô phỏng so sánh độ sẵn có của nguồn; khi triển khai thật cần khảo sát địa điểm, thiết bị, lưu trữ và an toàn.",
+        controls: [
+          { id: "sun", label: "☀️ Ánh nắng", min: 0, max: 100, value: 80, unit: "%" },
+          { id: "wind", label: "🌬️ Sức gió", min: 0, max: 100, value: 45, unit: "%" },
+          { id: "flow", label: "💧 Dòng nước", min: 0, max: 100, value: 35, unit: "%" }
+        ]
+      }
+    };
+    const state = {
+      topicId: null,
+      level: 1,
+      questionIndex: 0,
+      questions: [],
+      score: 0,
+      hintLevel: 0,
+      selectedAnswer: null,
+      locked: false,
+      history: [],
+      statsReturnScreen: "homeScreen",
+      labReturnScreen: "homeScreen",
+      simulationScenario: "plant"
+    };
+
+    const elements = {
+      home: document.getElementById("homeScreen"),
+      game: document.getElementById("gameScreen"),
+      stats: document.getElementById("statsScreen"),
+      topicGrid: document.getElementById("topicGrid"),
+      start: document.getElementById("startButton"),
+      question: document.getElementById("questionText"),
+      answers: document.getElementById("answers"),
+      feedback: document.getElementById("feedback"),
+      hintCopy: document.getElementById("hintCopy"),
+      hintButton: document.getElementById("hintButton"),
+      notice: document.getElementById("notice")
+    };
+    state.history = loadHistory();
+
+    function loadHistory() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw === null) return [];
+        const value = JSON.parse(raw);
+        if (!Array.isArray(value) || value.some(entry =>
+          !entry || typeof entry.topicId !== "string" || typeof entry.correct !== "boolean" ||
+          typeof entry.timestamp !== "string"
+        )) throw new Error("Dữ liệu lịch sử không đúng định dạng.");
+        return value.slice(-1000);
+      } catch (error) {
+        showNotice("Không đọc được lịch sử trên thiết bị. Trò chơi vẫn hoạt động, nhưng kết quả cũ có thể không hiển thị.");
+        console.error("Không thể đọc lịch sử trò chơi:", error);
+        return [];
+      }
+    }
+
+    function saveHistory() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.history.slice(-1000)));
+      } catch (error) {
+        showNotice("Không thể lưu kết quả trên thiết bị. Em vẫn có thể tiếp tục chơi.");
+        console.error("Không thể lưu lịch sử trò chơi:", error);
+      }
+    }
+
+    function showNotice(message) {
+      elements.notice.textContent = message;
+      elements.notice.hidden = false;
+      window.clearTimeout(showNotice.timer);
+      showNotice.timer = window.setTimeout(() => { elements.notice.hidden = true; }, 6000);
+    }
+
+    function topicById(id) {
+      return topics.find(topic => topic.id === id);
+    }
+
+    function showScreen(screen) {
+      [elements.home, elements.game, elements.stats, document.getElementById("simulationScreen")]
+        .forEach(item => item.classList.remove("active"));
+      screen.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderSimulationControls() {
+      const scenario = simulations[state.simulationScenario];
+      document.getElementById("scenarioTitle").textContent = scenario.title;
+      document.getElementById("scenarioDescription").textContent = scenario.description;
+      document.getElementById("simulationQuestion").textContent = scenario.question;
+      document.getElementById("simulationNote").textContent = scenario.note;
+      document.getElementById("simulationStage").dataset.scenario = state.simulationScenario;
+      const controls = document.getElementById("rangeControls");
+      controls.replaceChildren();
+
+      scenario.controls.forEach(control => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "range-control";
+        const heading = document.createElement("label");
+        heading.className = "range-heading";
+        heading.htmlFor = `range-${control.id}`;
+        const label = document.createElement("span");
+        label.textContent = control.label;
+        const value = document.createElement("span");
+        value.className = "range-value";
+        value.id = `value-${control.id}`;
+        value.textContent = `${control.value}${control.unit}`;
+        heading.append(label, value);
+
+        const slider = document.createElement("input");
+        slider.type = "range";
+        slider.id = `range-${control.id}`;
+        slider.min = String(control.min);
+        slider.max = String(control.max);
+        slider.value = String(control.value);
+        slider.setAttribute("aria-label", control.label);
+        slider.addEventListener("input", () => {
+          document.getElementById(`value-${control.id}`).textContent = `${slider.value}${control.unit}`;
+          updateSimulation();
+        });
+
+        const scale = document.createElement("div");
+        scale.className = "range-scale";
+        const minimum = document.createElement("span");
+        minimum.textContent = `${control.min}${control.unit}`;
+        const maximum = document.createElement("span");
+        maximum.textContent = `${control.max}${control.unit}`;
+        scale.append(minimum, maximum);
+        wrapper.append(heading, slider, scale);
+        controls.append(wrapper);
+      });
+      updateSimulation();
+    }
+
+    function renderSimulationResult(title, summary, details) {
+      const result = document.getElementById("simulationResult");
+      result.replaceChildren();
+      const heading = document.createElement("strong");
+      heading.textContent = title;
+      result.append(heading, document.createTextNode(summary));
+      details.forEach(detail => {
+        const line = document.createElement("div");
+        line.className = "effect-detail";
+        line.textContent = detail;
+        result.append(line);
+      });
+    }
+
+    function simulationValues() {
+      return Object.fromEntries(
+        [...document.querySelectorAll("#rangeControls input[type='range']")]
+          .map(slider => [slider.id.slice(6), Number(slider.value)])
+      );
+    }
+
+    function updateSimulation() {
+      const values = simulationValues();
+      const result = document.getElementById("simulationResult");
+      const stage = document.getElementById("simulationStage");
+
+      if (state.simulationScenario === "plant") {
+        const lightScore = values.light < 15 ? 20 : values.light < 35 ? 55 : values.light <= 80 ? 100 : values.light <= 92 ? 70 : 45;
+        const temperatureScore = values.temperature <= 8 ? 15 : values.temperature <= 14 ? 45 : values.temperature <= 18 ? 75 : values.temperature <= 30 ? 100 : values.temperature <= 35 ? 65 : 25;
+        const waterScore = values.water < 15 ? 15 : values.water < 30 ? 50 : values.water <= 75 ? 100 : values.water <= 90 ? 55 : 25;
+        const score = Math.round(lightScore * .4 + temperatureScore * .3 + waterScore * .3);
+        const scale = 0.55 + score / 100 * 0.65;
+        document.getElementById("plantGrowing").style.transform = `scaleY(${scale})`;
+        const leaves = document.getElementById("plantLeaves");
+        const thirsty = values.water < 20 || (values.light > 92 && values.water < 45);
+        const waterlogged = values.water > 90;
+        const cold = values.temperature < 10;
+        const hot = values.temperature > 35;
+        leaves.classList.toggle("drooping", thirsty || waterlogged || hot);
+        leaves.classList.toggle("pale", values.light < 20 || cold);
+        leaves.classList.toggle("heat-stress", hot);
+        leaves.setAttribute("fill", score < 35 ? "#a4a34b" : "#57c77d");
+        document.getElementById("plantStem").setAttribute("stroke", score < 35 ? "#a4a34b" : "#74d68c");
+        document.getElementById("plantFlower").setAttribute("opacity", score > 75 ? "1" : ".15");
+        document.getElementById("plantSun").setAttribute("opacity", String(.2 + values.light / 125));
+        document.getElementById("sunRays").setAttribute("opacity", String(.15 + values.light / 125));
+        document.getElementById("soilWater").setAttribute("opacity", String(.15 + values.water / 125));
+        stage.setAttribute("aria-label", `Mô phỏng cây phát triển ở mức ${score} trên 100`);
+        const lightEffect = values.light < 15
+          ? "Rất ít ánh sáng: cây khó quang hợp và tạo thức ăn."
+          : values.light < 35
+            ? "Ít ánh sáng: quang hợp chậm, cây có thể yếu và vươn về phía sáng."
+            : values.light <= 80
+              ? "Ánh sáng vừa đủ: hỗ trợ cây quang hợp và phát triển."
+              : values.light <= 92
+                ? "Nắng mạnh: cây cần đủ nước để không bị khô."
+                : "Nắng rất gắt: lá có thể nóng và mất nước nhanh.";
+        const temperatureEffect = values.temperature < 10
+          ? "Quá lạnh: cây phát triển chậm, một số cây có thể bị tổn thương."
+          : values.temperature < 18
+            ? "Trời mát: nhiều cây vẫn sống nhưng lớn chậm hơn."
+            : values.temperature <= 30
+              ? "Nhiệt độ ôn hòa: phù hợp với cây trong mô phỏng này."
+              : values.temperature <= 35
+                ? "Trời nóng: cây mất nước nhanh hơn, cần được theo dõi."
+                : "Quá nóng: cây dễ héo và khó phát triển.";
+        const waterEffect = values.water < 15
+          ? "Rất ít nước: cây thiếu nước, lá rũ xuống và héo."
+          : values.water < 30
+            ? "Ít nước: cây có thể khát; tăng nước vừa phải để cây hồi phục."
+            : values.water <= 75
+              ? "Nước vừa đủ: rễ có nước để đưa lên nuôi cây."
+              : values.water <= 90
+                ? "Nhiều nước: đất có thể quá ẩm, rễ cần không khí."
+                : "Quá nhiều nước: đất úng làm rễ thiếu không khí và cây có thể héo.";
+        const condition = score >= 75
+          ? "Cây có điều kiện khá thuận lợi trong mô phỏng."
+          : score >= 45
+            ? "Một vài yếu tố đang làm cây phát triển chậm."
+            : "Nhiều yếu tố chưa phù hợp; cây đang yếu.";
+        renderSimulationResult(`🌱 Mức phát triển mô phỏng: ${score}%`, condition, [
+          `Ánh sáng ${values.light}%: ${lightEffect}`,
+          `Nhiệt độ ${values.temperature}°C: ${temperatureEffect}`,
+          `Nước ${values.water} ml/ngày: ${waterEffect}`
+        ]);
+        return;
+      }
+
+      if (state.simulationScenario === "water") {
+        const airWarmth = values.airTemp / 40 * 100;
+        const evaporation = Math.round(values.sunlight * .65 + airWarmth * .35);
+        const coldness = (40 - values.airTemp) / 40 * 100;
+        const condensation = Math.round(evaporation * coldness / 100);
+        const rain = condensation >= 40;
+        const vapor = document.getElementById("vaporGroup");
+        const clouds = document.getElementById("waterCloud");
+        const rainGroup = document.getElementById("rainGroup");
+        const vaporDuration = `${3.5 - evaporation / 100 * 2.5}s`;
+        document.getElementById("waterSun").setAttribute("opacity", String(.12 + values.sunlight / 115));
+        vapor.setAttribute("opacity", String(.05 + evaporation / 105));
+        vapor.style.setProperty("--vapor-duration", vaporDuration);
+        vapor.querySelectorAll(".water-vapor").forEach((circle, index) => {
+          circle.setAttribute("cy", String(244 - evaporation * .58 - index % 3 * 10));
+        });
+        clouds.setAttribute("opacity", String(.2 + condensation / 125));
+        clouds.setAttribute("fill", rain ? "#aebdce" : "#eaf7ff");
+        rainGroup.setAttribute("opacity", rain ? String(Math.min(1, .2 + condensation / 80)) : ".02");
+        rainGroup.style.setProperty("--rain-duration", `${1.8 - Math.min(condensation, 100) / 100 * 1.25}s`);
+        stage.setAttribute("aria-label", `Mô phỏng vòng tuần hoàn nước: bay hơi ${evaporation} phần trăm, ngưng tụ ${condensation} phần trăm`);
+        const sunEffect = values.sunlight < 20
+          ? "Ít nắng: mặt nước nhận ít nhiệt nên bốc hơi chậm."
+          : values.sunlight < 60
+            ? "Nắng vừa: một phần nước nhận nhiệt và bốc hơi."
+            : "Nắng mạnh: nhiều nước nhận nhiệt và bay hơi nhanh hơn.";
+        const temperatureEffect = values.airTemp < 10
+          ? "Không khí lạnh làm hơi nước dễ ngưng tụ thành mây."
+          : values.airTemp <= 24
+            ? "Không khí mát giúp hơi nước ngưng tụ; mây có thể hình thành."
+            : values.airTemp <= 32
+              ? "Không khí ấm giữ hơi nước lâu hơn, ngưng tụ và tạo mưa ít hơn."
+              : "Không khí nóng làm nước bốc hơi nhanh nhưng khó ngưng tụ thành mây mưa.";
+        const weather = rain
+          ? "Mây có nhiều giọt nước: mưa đang rơi trở lại mặt đất."
+          : condensation > 18
+            ? "Hơi nước đang ngưng tụ thành mây, nhưng chưa đủ để tạo mưa rõ."
+            : "Có ít mây ngưng tụ nên hiện chưa có mưa.";
+        renderSimulationResult(`💧 Bốc hơi: ${evaporation}% · Ngưng tụ: ${condensation}%`, weather, [
+          `Nắng ${values.sunlight}%: ${sunEffect}`,
+          `Không khí ${values.airTemp}°C: ${temperatureEffect}`
+        ]);
+        return;
+      }
+
+      const resources = [
+        { id: "sun", name: "Pin Mặt Trời", value: values.sun },
+        { id: "wind", name: "Tua-bin gió", value: values.wind },
+        { id: "flow", name: "Thủy điện nhỏ", value: values.flow }
+      ];
+      const best = resources.reduce((winner, resource) => resource.value > winner.value ? resource : winner);
+      const powered = best.value >= 20;
+      const houseLights = document.getElementById("houseLights");
+      houseLights.setAttribute("opacity", powered ? String(.35 + best.value / 155) : ".08");
+      document.getElementById("energySun").setAttribute("opacity", String(.2 + values.sun / 130));
+      document.getElementById("solarPanels").setAttribute("opacity", String(.25 + values.sun / 130));
+      stage.style.setProperty("--wind-duration", `${Math.max(1, 5 - values.wind / 25)}s`);
+      stage.style.setProperty("--water-duration", `${Math.max(1, 5 - values.flow / 25)}s`);
+      document.getElementById("windLines").setAttribute("opacity", String(values.wind / 100));
+      document.getElementById("waterFlow").setAttribute("opacity", String(values.flow / 100));
+      stage.dataset.wind = String(values.wind >= 15);
+      stage.dataset.water = String(values.flow >= 15);
+      stage.dataset.powered = String(powered);
+      document.getElementById("energyStatusLabel").textContent = powered ? "NGÔI LÀNG ĐANG SÁNG ĐÈN" : "NGUỒN NĂNG LƯỢNG CÒN YẾU";
+      stage.setAttribute("aria-label", powered ? `Ngôi làng được cấp điện tốt nhất bởi ${best.name}` : "Các nguồn năng lượng hiện còn yếu");
+      const energyExplanation = {
+        sun: "Ánh sáng chiếu lên tấm pin trên mái và được chuyển thành điện.",
+        wind: "Gió làm cánh tua-bin quay; tua-bin giúp tạo ra điện.",
+        flow: "Dòng nước làm bánh xe hoặc tua-bin quay để tạo ra điện."
+      };
+      const sourceEffect = resource => resource.value < 15
+        ? `${resource.name} còn yếu (${resource.value}%): điều kiện hiện tại chưa thuận lợi.`
+        : resource.value < 40
+          ? `${resource.name} có tiềm năng thấp (${resource.value}%): có thể tạo ít điện.`
+          : resource.value < 70
+            ? `${resource.name} có tiềm năng vừa (${resource.value}%): có thể góp phần cấp điện.`
+            : `${resource.name} có tiềm năng cao (${resource.value}%): đây là điều kiện thuận lợi.`;
+      renderSimulationResult(
+        powered ? `⚡ Nguồn phù hợp nhất: ${best.name} (${best.value}%)` : "⚡ Chưa có nguồn nào đủ mạnh",
+        powered ? energyExplanation[best.id] : "Hãy tăng nắng, gió hoặc dòng nước để tìm nguồn có thể giúp ngôi làng.",
+        resources.map(sourceEffect)
+      );
+    }
+
+    function openLab() {
+      state.labReturnScreen = elements.game.classList.contains("active") ? "gameScreen" : "homeScreen";
+      showScreen(document.getElementById("simulationScreen"));
+      renderSimulationControls();
+    }
+
+    function renderTopics() {
+      topics.forEach(topic => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "topic-card";
+        card.dataset.topic = topic.id;
+        card.setAttribute("aria-pressed", "false");
+        const emoji = document.createElement("span");
+        emoji.className = "topic-emoji";
+        emoji.setAttribute("aria-hidden", "true");
+        emoji.textContent = topic.emoji;
+        const title = document.createElement("strong");
+        title.textContent = topic.title;
+        const summary = document.createElement("small");
+        summary.textContent = topic.summary;
+        const grade = document.createElement("span");
+        grade.className = "grade";
+        grade.textContent = topic.grade;
+        card.append(emoji, title, summary, grade);
+        card.addEventListener("click", () => selectTopic(topic.id));
+        elements.topicGrid.append(card);
+      });
+    }
+
+    function selectTopic(id) {
+      state.topicId = id;
+      document.querySelectorAll(".topic-card").forEach(card => {
+        const selected = card.dataset.topic === id;
+        card.classList.toggle("selected", selected);
+        card.setAttribute("aria-pressed", String(selected));
+      });
+      const topic = topicById(id);
+      elements.start.disabled = false;
+      elements.start.textContent = `Bắt đầu: ${topic.title} →`;
+    }
+
+    function startGame() {
+      const topic = topicById(state.topicId);
+      if (!topic) return;
+      state.questions = topic.questions[state.level];
+      state.questionIndex = 0;
+      state.score = 0;
+      showScreen(elements.game);
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const topic = topicById(state.topicId);
+      const question = state.questions[state.questionIndex];
+      state.hintLevel = 0;
+      state.selectedAnswer = null;
+      state.locked = false;
+      document.getElementById("progressTopic").textContent = topic.title;
+      document.getElementById("progressText").textContent = `Câu ${state.questionIndex + 1}/${state.questions.length}`;
+      document.getElementById("progressFill").style.width = `${(state.questionIndex / state.questions.length) * 100}%`;
+      document.getElementById("scoreText").textContent = String(state.score);
+      document.getElementById("levelTag").textContent = `Mức ${state.level} · ${levelNames[state.level - 1]}`;
+      document.getElementById("topicTag").textContent = topic.grade;
+      elements.question.textContent = question.text;
+      document.getElementById("sceneArt").textContent = question.art;
+      document.getElementById("sceneCaption").textContent = question.scene;
+      elements.answers.replaceChildren();
+      question.options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "answer";
+        button.dataset.index = String(index);
+        const letter = document.createElement("span");
+        letter.className = "answer-letter";
+        letter.textContent = String.fromCharCode(65 + index);
+        const illustration = document.createElement("span");
+        illustration.className = "answer-illustration";
+        illustration.setAttribute("aria-hidden", "true");
+        illustration.textContent = answerIllustration(option);
+        const label = document.createElement("span");
+        label.textContent = option;
+        button.append(letter, illustration, label);
+        button.addEventListener("click", () => chooseAnswer(index));
+        elements.answers.append(button);
+      });
+      elements.feedback.innerHTML = '<span class="feedback-icon" aria-hidden="true">💡</span><span>Chọn một đáp án để khám phá nhé!</span>';
+      elements.hintCopy.innerHTML = "<strong>Robot Thông Thái 🤖</strong>Em cần gợi ý? Robot sẽ giúp từng bước.";
+      elements.hintButton.disabled = false;
+      elements.hintButton.textContent = "💡 Gợi ý (0/3)";
+      elements.hintButton.setAttribute("aria-label", "Xem gợi ý, đã dùng 0 trên 3");
+    }
+
+    function answerIllustration(answer) {
+      const illustrations = [
+        [/nước trong lọ hóa chất/i, "🧪"],
+        [/nước ngọt có ga/i, "🥤"],
+        [/thức ăn cho chó/i, "🥣"],
+        [/cá voi/i, "🐋"],
+        [/quả chuối/i, "🍌"],
+        [/quả dưa hấu/i, "🍉"],
+        [/quả dâu tây/i, "🍓"],
+        [/quả cam/i, "🍊"],
+        [/quả táo/i, "🍎"],
+        [/cái ô|^ô$/i, "☂️"],
+        [/nhìn thẳng vào mặt trời|tự dùng thuốc|cố bê|đặt sát hơn|lay thật mạnh|la hét|bắt con vật|tự kéo dây|mang con non đi|túm lấy|đứng sát loa|cầm lên ngay|ngồi vào ngay|la to|giấu đi|tự ra ngoài|nhặt lên chơi|trượt chơi|chơi gần cống|phơi đồ lên người|nhặt đồ đang bay|đứng ngoài chụp ảnh|lội thử|tách khỏi gia đình|chơi thuyền giấy/i, "⚠️"],
+        [/để bay lên trời/i, "🎈"],
+        [/cả hai chắc chắn như nhau/i, "⚖️"],
+        [/đang khỏe/i, "💪"],
+        [/để làm thú cưng bay|mỗi loài vật có cách sống riêng|con vật sẽ hát|để con vật thức dậy/i, "🐾"],
+        [/cho con vật uống thuốc/i, "💊"],
+        [/đứng sát loa/i, "🔊"],
+        [/tiếp tục chơi/i, "🎲"],
+        [/lay động/i, "🍃"],
+        [/tối như ban đêm/i, "🌙"],
+        [/đầy tuyết/i, "❄️"],
+        [/^ướt$/i, "💧"],
+        [/bắt con vật|mang con non đi|bế con vật/i, "🐾"],
+        [/tự kéo dây/i, "🧵"],
+        [/đặt sát hơn/i, "🔥"],
+        [/ngồi vào ngay/i, "🛁"],
+        [/cố bê lên cao/i, "💪"],
+        [/cầm lên ngay|nhặt lên chơi/i, "✋"],
+        [/la hét|la to/i, "📣"],
+        [/giấu đi/i, "🙈"],
+        [/tự ra ngoài tìm/i, "🚶"],
+        [/chơi gần cống/i, "🚧"],
+        [/phơi đồ lên người/i, "👕"],
+        [/nhặt đồ đang bay/i, "🍃"],
+        [/đứng ngoài chụp ảnh/i, "📸"],
+        [/lội thử/i, "🌊"],
+        [/chơi thuyền giấy/i, "⛵"],
+        [/^voi$/i, "🐘"],
+        [/sư tử/i, "🦁"],
+        [/ếch/i, "🐸"],
+        [/rùa/i, "🐢"],
+        [/hươu cao cổ/i, "🦒"],
+        [/bướm/i, "🦋"],
+        [/nhện/i, "🕷️"],
+        [/ong/i, "🐝"],
+        [/kangaroo/i, "🦘"],
+        [/chuột/i, "🐭"],
+        [/gà con/i, "🐥"],
+        [/gà trống/i, "🐓"],
+        [/tổ ong/i, "🐝"],
+        [/vịt/i, "🦆"],
+        [/mèo/i, "🐱"],
+        [/chó/i, "🐶"],
+        [/cá voi/i, "🐋"],
+        [/chim|chim non/i, "🐦"],
+        [/động vật hoang dã|rừng/i, "🌳"],
+        [/cầu vồng/i, "🌈"],
+        [/mặt trăng/i, "🌙"],
+        [/mặt trời|nắng|ánh sáng|sáng/i, "☀️"],
+        [/cây|lá|rễ|hạt|đất|cỏ|rồi|vườn/i, "🌿"],
+        [/hoa|nụ/i, "🌼"],
+        [/quả táo|quả cam|quả chuối|quả dâu|quả dưa|quả/i, "🍎"],
+        [/màu xanh/i, "🟢"],
+        [/màu tím/i, "🟣"],
+        [/màu bạc/i, "🩶"],
+        [/găng tay/i, "🧤"],
+        [/áo ấm|áo khoác|áo len|áo mưa/i, "🧥"],
+        [/đồ bơi|áo tắm/i, "🩱"],
+        [/kính|mắt kính/i, "👓"],
+        [/ủng/i, "🥾"],
+        [/chậu|đất khô|đất sũng|đất ướt/i, "🪴"],
+        [/nước sạch|nước uống/i, "💧"],
+        [/mưa|giông|sấm|chớp|sét|khói/i, "🌧️"],
+        [/gió|không khí|thoáng/i, "🌬️"],
+        [/mây|đám mây/i, "☁️"],
+        [/chong chóng|quay/i, "🌀"],
+        [/bóng râm|nơi râm|chỗ mát|nơi mát/i, "🌳"],
+        [/nhà|trong nhà|nơi trú|phòng/i, "🏠"],
+        [/cửa sổ/i, "🪟"],
+        [/cầu thang|cầu/i, "🌈"],
+        [/xe|giao thông|đường/i, "🚗"],
+        [/đèn giao thông|đèn đỏ/i, "🚦"],
+        [/đèn|công tắc|ánh sáng/i, "💡"],
+        [/bật|công tắc/i, "💡"],
+        [/nước biển/i, "🌊"],
+        [/nước ngọt|sữa/i, "🥛"],
+        [/nước/i, "💧"],
+        [/người lớn|cô giáo|người thân|báo người|gọi người|hỏi người|nhờ người|cùng người|nắm tay/i, "🧑‍🧒"],
+        [/không chạm|đứng xa|tránh xa|không đi qua|dừng lại|đừng|không nhìn|không ăn|không tự|không nên|lùi lại|đi vòng|đặt xuống|rời xa|rời khỏi|ngắm từ xa|chờ trời|đi chậm|không thò tay|để con vật nghỉ|không làm phiền/i, "🙅"],
+        [/rửa tay|rửa sạch|xà phòng/i, "🧼"],
+        [/đồ chơi|bóng|viên bi/i, "🧸"],
+        [/đá|sỏi|viên đá/i, "🪨"],
+        [/bàn|ghế|sân|mái nhà|mái hiên/i, "🏠"],
+        [/túi|cặp/i, "🎒"],
+        [/tủ|ngăn kéo|hộp/i, "📦"],
+        [/giày|dép/i, "👟"],
+        [/tóc/i, "💇"],
+        [/mềm|cứng|bề mặt|chạm/i, "✋"],
+        [/âm thanh|tiếng|nghe|chuông|còi|báo động/i, "🔊"],
+        [/màu sắc|màu/i, "🌈"],
+        [/chân|đầu gối/i, "🦵"],
+        [/chờ|đứng yên|nghỉ|ngủ|yên tĩnh/i, "😌"],
+        [/bơi|nước sâu|suối|bờ biển/i, "🏊"],
+        [/nóng|bếp|lò|nồi|canh/i, "🔥"],
+        [/lạnh|rét|run/i, "🥶"],
+        [/khát|uống nước|nước sạch/i, "🥤"],
+        [/mùi|ngửi|hương/i, "👃"],
+        [/nếm|vị|ăn/i, "👅"],
+        [/nhìn|quan sát|ngắm/i, "👀"],
+        [/mắt|nhắm mắt|dụi mắt/i, "👀"],
+        [/tai|bịt tai/i, "👂"],
+        [/tự mở cửa|mở cổng/i, "🚪"],
+        [/cành|cây cao|trèo cây/i, "🌳"],
+        [/lửa|nến/i, "🕯️"],
+        [/điện|dây điện|ổ điện/i, "⚡"],
+        [/nguy hiểm|an toàn|bị thương|đau|bỏng/i, "⚠️"],
+        [/mặt đất|đất|mặt đường/i, "🌱"],
+        [/kích thước|lớn như|nhỏ/i, "📏"],
+        [/mật/i, "🍯"],
+        [/phô mai/i, "🧀"],
+        [/kẹo|bánh/i, "🍬"],
+        [/nước ngọt có ga/i, "🥤"],
+        [/mảnh vỡ|vỡ/i, "⚠️"],
+        [/lá khô|lá rụng/i, "🍂"],
+        [/thức ăn/i, "🥣"],
+        [/áo|quần/i, "👕"],
+        [/trứng/i, "🥚"],
+        [/quạt/i, "🪭"],
+        [/cát/i, "🏖️"],
+        [/mưa|nước mưa/i, "🌧️"],
+        [/mũ/i, "🧢"],
+        [/ô/i, "☂️"],
+        [/bình tưới|tưới/i, "🚿"],
+        [/cốc|ly/i, "🥛"],
+        [/bình/i, "🫙"],
+        [/thìa/i, "🥄"],
+        [/công viên/i, "🌳"],
+        [/mặt nạ|kính bơi/i, "🥽"],
+        [/thời gian|chờ thêm|vài ngày/i, "⏳"],
+        [/rửa|lau/i, "🧽"],
+        [/cứu|giúp/i, "🆘"],
+        [/chạy/i, "🏃"],
+        [/lùi|bước|đi vòng|đi theo/i, "👣"],
+        [/cười|vui/i, "😊"],
+        [/một mình|một mình/i, "🚫"],
+        [/đất|rễ/i, "🌱"],
+        [/nơi có không khí|thoáng/i, "🌬️"],
+        [/ngoài trời/i, "🌳"],
+        [/cái thìa/i, "🥄"],
+        [/cái bàn/i, "🪑"],
+        [/đôi tất/i, "🧦"],
+        [/vỏ sò/i, "🐚"],
+        [/quả dưa hấu/i, "🍉"],
+        [/quả dâu tây/i, "🍓"],
+        [/sa mạc/i, "🏜️"],
+        [/mái nhà/i, "🏠"],
+        [/xe đạp/i, "🚲"],
+        [/bút chì/i, "✏️"],
+        [/nước biển/i, "🌊"],
+        [/giẫm|bẻ lá|bứt hết lá|chạy lại ôm|chọc vào|chạy thật nhanh|nhảy xuống|đứng dưới cây cao|đi chân đất một mình|nhìn thẳng vào mặt trời|nếm ngay/i, "⚠️"],
+        [/chạm tay vào nồi/i, "🍲"],
+        [/tưới/i, "🚿"],
+        [/trên cây/i, "🌳"],
+        [/dưới nước/i, "🐟"],
+        [/cất cây vào tủ|che cây trong hộp|trong hộp|trong tủ/i, "📦"],
+        [/cho cây ăn bánh|kẹo|bánh/i, "🍬"],
+        [/nước trong lọ hóa chất/i, "🧪"],
+        [/nước biển/i, "🌊"],
+        [/nước ngọt/i, "🧃"],
+        [/nước/i, "💧"],
+        [/ánh nắng|ánh sáng|mặt trời/i, "☀️"],
+        [/hạt|trong đất/i, "🌱"],
+        [/cây|lá|cành/i, "🌿"],
+        [/meo meo/i, "🐱"],
+        [/ò ó o/i, "🐓"],
+        [/quạc quạc/i, "🦆"],
+        [/mèo/i, "🐱"],
+        [/thức ăn cho chó/i, "🥣"],
+        [/chó/i, "🐶"],
+        [/thỏ/i, "🐰"],
+        [/cá voi/i, "🐋"],
+        [/(^|\s)cá(\s|$)/i, "🐟"],
+        [/vịt/i, "🦆"],
+        [/gà/i, "🐔"],
+        [/chim bồ câu/i, "🕊️"],
+        [/chim/i, "🐦"],
+        [/hổ/i, "🐯"],
+        [/tai/i, "👂"],
+        [/mũi/i, "👃"],
+        [/mắt/i, "👀"],
+        [/lưỡi|miệng/i, "👅"],
+        [/bàn chân/i, "🦶"],
+        [/đầu gối/i, "🦵"],
+        [/tay|bàn tay|chạm/i, "✋"],
+        [/mũ|nón/i, "🧢"],
+        [/cái ô|^ô$|áo mưa/i, "☂️"],
+        [/áo ba lỗ/i, "👕"],
+        [/áo tắm|đồ bơi/i, "🩱"],
+        [/quần đùi/i, "🩳"],
+        [/áo khoác/i, "🧥"],
+        [/ủng/i, "🥾"],
+        [/kính/i, "🕶️"],
+        [/sấm|mưa|vũng nước/i, "🌧️"],
+        [/gió/i, "🌬️"],
+        [/nóng|nồi|canh/i, "🍲"],
+        [/hỏi người lớn|vào nhà|đi cùng người lớn/i, "🧑‍🧒"],
+        [/đồ chơi|bóng/i, "🧸"],
+        [/sỏi|đá cuội/i, "🪨"],
+        [/thìa/i, "🥄"],
+        [/ghế/i, "🪑"],
+        [/giày/i, "👟"],
+        [/hoa/i, "🌸"],
+        [/cầu vồng/i, "🌈"],
+        [/chuông/i, "🔔"],
+        [/trống/i, "🥁"],
+        [/chuối/i, "🍌"],
+        [/cà rốt/i, "🥕"],
+        [/trứng/i, "🥚"],
+        [/khăn tắm/i, "🧻"],
+        [/bút chì/i, "✏️"],
+        [/chạy|nhảy|giẫm|bẻ|bứt|chọc/i, "🙅"],
+        [/dưới gầm giường/i, "🛏️"],
+        [/hộp|tủ/i, "📦"],
+        [/ra ngoài chơi/i, "🏃"],
+        [/quạt/i, "🪭"],
+        [/biển/i, "🌊"]
+      ];
+      return illustrations.find(([pattern]) => pattern.test(answer))?.[1] ?? "✨";
+    }
+
+    function recordAnswer(correct) {
+      const question = state.questions[state.questionIndex];
+      state.history.push({
+        topicId: state.topicId,
+        level: state.level,
+        correct,
+        timestamp: new Date().toISOString(),
+        question: question.text,
+        answer: question.options[state.selectedAnswer]
+      });
+      if (state.history.length > 1000) state.history = state.history.slice(-1000);
+      saveHistory();
+    }
+
+    function chooseAnswer(index) {
+      if (state.locked) return;
+      state.selectedAnswer = index;
+      const question = state.questions[state.questionIndex];
+      const correct = index === question.answer;
+      recordAnswer(correct);
+      const buttons = [...elements.answers.querySelectorAll(".answer")];
+      buttons.forEach((button, buttonIndex) => {
+        if (buttonIndex === index) button.classList.add(correct ? "correct" : "wrong");
+      });
+      const feedbackIcon = correct ? "🎉" : "🧠";
+      const feedbackTitle = correct ? "Chính xác! Em làm tốt lắm!" : "Chưa đúng rồi, mình thử lại nhé!";
+      const feedbackText = correct ? question.explain : "Hãy đọc lại câu hỏi hoặc dùng một gợi ý. Em có thể chọn đáp án khác.";
+      elements.feedback.replaceChildren();
+      const icon = document.createElement("span");
+      icon.className = "feedback-icon";
+      icon.setAttribute("aria-hidden", "true");
+      icon.textContent = feedbackIcon;
+      const copy = document.createElement("span");
+      const title = document.createElement("strong");
+      title.textContent = feedbackTitle;
+      copy.append(title, document.createTextNode(feedbackText));
+      const illustration = document.createElement("span");
+      illustration.className = "feedback-illustration";
+      illustration.setAttribute("aria-hidden", "true");
+      illustration.textContent = answerIllustration(question.options[index]);
+      elements.feedback.append(icon, illustration, copy);
+      if (correct) {
+        state.locked = true;
+        state.score += state.hintLevel === 0 ? 10 : 5;
+        document.getElementById("scoreText").textContent = String(state.score);
+        buttons.forEach(button => { button.disabled = true; });
+        elements.hintButton.disabled = true;
+        elements.hintCopy.innerHTML = `<strong>Robot Thông Thái 🤖</strong>${escapeText(question.explain)}`;
+        const isLast = state.questionIndex === state.questions.length - 1;
+        elements.hintButton.textContent = isLast ? "🏁 Xem kết quả" : "Câu tiếp theo →";
+        elements.hintButton.disabled = false;
+        elements.hintButton.dataset.action = "next";
+      } else {
+        elements.hintButton.dataset.action = "";
+      }
+    }
+
+    function escapeText(text) {
+      const span = document.createElement("span");
+      span.textContent = text;
+      return span.innerHTML;
+    }
+
+    function showHint() {
+      if (state.locked) {
+        nextQuestion();
+        return;
+      }
+      if (state.hintLevel >= 3) return;
+      const hints = state.questions[state.questionIndex].hints;
+      const hint = hints[state.hintLevel];
+      state.hintLevel += 1;
+      elements.hintCopy.innerHTML = `<strong>Gợi ý ${state.hintLevel}/3 🤖</strong>${escapeText(hint)}`;
+      elements.hintButton.textContent = state.hintLevel === 3 ? "Đã hết gợi ý" : `💡 Gợi ý (${state.hintLevel}/3)`;
+      elements.hintButton.setAttribute("aria-label", `Xem gợi ý, đã dùng ${state.hintLevel} trên 3`);
+      elements.hintButton.disabled = state.hintLevel === 3;
+      if (state.hintLevel >= 2) {
+        const answerIndex = state.questions[state.questionIndex].answer;
+        elements.answers.querySelectorAll(".answer").forEach((button, index) => {
+          if (index !== answerIndex) button.classList.add("dimmed");
+        });
+      }
+    }
+
+    function nextQuestion() {
+      if (state.questionIndex < state.questions.length - 1) {
+        state.questionIndex += 1;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      const topic = topicById(state.topicId);
+      document.getElementById("progressFill").style.width = "100%";
+      elements.question.textContent = `Hoàn thành hành trình ${topic.title}!`;
+      document.getElementById("sceneArt").textContent = "🏆";
+      document.getElementById("sceneCaption").textContent = "Mỗi lần thử là một khám phá mới.";
+      elements.answers.replaceChildren();
+      const result = document.createElement("div");
+      result.className = "empty-state";
+      result.innerHTML = `<div style="font-size:48px">⭐ ${state.score} điểm</div><p>Em đã hoàn thành ${state.questions.length} câu hỏi. Hãy tiếp tục khám phá một chủ đề khác nhé!</p>`;
+      elements.answers.append(result);
+      elements.feedback.innerHTML = '<span class="feedback-icon" aria-hidden="true">👏</span><span><strong>Chuyến đi tuyệt vời!</strong>Kết quả đã được ghi vào bảng tiến bộ trên thiết bị này.</span>';
+      elements.hintCopy.innerHTML = "<strong>Muốn khám phá tiếp? 🤖</strong>Em có thể đổi chủ đề hoặc thử một mức khó hơn.";
+      elements.hintButton.textContent = "← Chọn chủ đề";
+      elements.hintButton.disabled = false;
+      elements.hintButton.dataset.action = "home";
+    }
+
+    function renderStats() {
+      const total = state.history.length;
+      const correct = state.history.filter(entry => entry.correct).length;
+      document.getElementById("totalAnswers").textContent = String(total);
+      document.getElementById("correctAnswers").textContent = String(correct);
+      document.getElementById("accuracy").textContent = `${total ? Math.round(correct / total * 100) : 0}%`;
+      const chart = document.getElementById("statsChart");
+      chart.replaceChildren();
+      if (!total) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        empty.textContent = "Chưa có kết quả nào. Hãy chọn một hành trình và bắt đầu khám phá!";
+        chart.append(empty);
+        return;
+      }
+      topics.forEach(topic => {
+        const entries = state.history.filter(entry => entry.topicId === topic.id);
+        const right = entries.filter(entry => entry.correct).length;
+        const wrong = entries.length - right;
+        const row = document.createElement("div");
+        row.className = "chart-row";
+        const label = document.createElement("span");
+        label.className = "chart-label";
+        label.textContent = `${topic.emoji} ${topic.title}`;
+        const track = document.createElement("div");
+        track.className = "bar-track";
+        track.setAttribute("role", "img");
+        track.setAttribute("aria-label", `${right} lần đúng, ${wrong} lần cần thử lại`);
+        const correctBar = document.createElement("span");
+        correctBar.className = "bar-correct";
+        correctBar.style.width = `${right / entries.length * 100}%`;
+        const wrongBar = document.createElement("span");
+        wrongBar.className = "bar-wrong";
+        wrongBar.style.width = `${wrong / entries.length * 100}%`;
+        track.append(correctBar, wrongBar);
+        const count = document.createElement("span");
+        count.className = "chart-count";
+        count.textContent = `${right} đúng · ${wrong} thử lại`;
+        row.append(label, track, count);
+        chart.append(row);
+      });
+    }
+
+    document.getElementById("difficultyPicker").addEventListener("click", event => {
+      const button = event.target.closest("button[data-level]");
+      if (!button) return;
+      state.level = Number(button.dataset.level);
+      document.querySelectorAll("#difficultyPicker button").forEach(item =>
+        item.classList.toggle("selected", item === button)
+      );
+    });
+
+    elements.start.addEventListener("click", startGame);
+    document.getElementById("homeButton").addEventListener("click", () => showScreen(elements.home));
+    document.getElementById("labButton").addEventListener("click", openLab);
+    document.getElementById("backFromLab").addEventListener("click", () => {
+      showScreen(state.labReturnScreen === "gameScreen" ? elements.game : elements.home);
+    });
+    document.getElementById("scenarioPicker").addEventListener("click", event => {
+      const button = event.target.closest("button[data-scenario]");
+      if (!button) return;
+      state.simulationScenario = button.dataset.scenario;
+      document.querySelectorAll("#scenarioPicker button").forEach(item => {
+        const selected = item === button;
+        item.classList.toggle("selected", selected);
+        item.setAttribute("aria-pressed", String(selected));
+      });
+      renderSimulationControls();
+    });
+    document.getElementById("statsButton").addEventListener("click", () => {
+      state.statsReturnScreen = elements.game.classList.contains("active")
+        ? "gameScreen"
+        : document.getElementById("simulationScreen").classList.contains("active")
+          ? "simulationScreen"
+          : "homeScreen";
+      renderStats();
+      showScreen(elements.stats);
+    });
+    document.getElementById("backFromStats").addEventListener("click", () => {
+      const returnTargets = {
+        gameScreen: elements.game,
+        simulationScreen: document.getElementById("simulationScreen"),
+        homeScreen: elements.home
+      };
+      showScreen(returnTargets[state.statsReturnScreen] || elements.home);
+    });
+    elements.hintButton.addEventListener("click", () => {
+      const action = elements.hintButton.dataset.action;
+      if (action === "home") showScreen(elements.home);
+      else if (action === "next") nextQuestion();
+      else showHint();
+    });
+    document.getElementById("clearHistoryButton").addEventListener("click", () => {
+      if (!state.history.length) return;
+      if (!window.confirm("Xóa toàn bộ lịch sử tiến bộ trên thiết bị này?")) return;
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        state.history = [];
+        renderStats();
+      } catch (error) {
+        showNotice("Không thể xóa lịch sử đã lưu trên thiết bị.");
+        console.error("Không thể xóa lịch sử trò chơi:", error);
+      }
+    });
+    document.addEventListener("keydown", event => {
+      if (!elements.game.classList.contains("active")) return;
+      if (["1", "2", "3"].includes(event.key) && !state.locked) chooseAnswer(Number(event.key) - 1);
+      else if (event.key === "Enter" && (state.locked || elements.hintButton.dataset.action === "next")) nextQuestion();
+    });
+
+    renderTopics();
+  </script>
+</body>
+</html>
