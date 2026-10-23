@@ -123,7 +123,6 @@
     }
     .scene-card { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 330px; padding: 24px; text-align: center; }
     .scene-art { display: grid; place-items: center; width: 100%; min-height: 175px; font-size: clamp(82px, 12vw, 125px); }
-    .scene-caption { color: var(--muted); font-weight: 650; line-height: 1.5; }
     .question-card { padding: clamp(20px, 3vw, 30px); }
     .question-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 13px; }
     .tag { padding: 6px 10px; border-radius: 999px; color: #e8dbff; background: rgba(196,163,255,.17); font-size: 12px; font-weight: 800; }
@@ -273,8 +272,8 @@
       .topic-card small { font-size: 12px; }
       .setup-row .button { width: 100%; margin-left: 0; }
       .question-layout { grid-template-columns: 1fr; gap: 12px; }
-      .scene-card { min-height: 130px; flex-direction: row; gap: 12px; padding: 12px 17px; text-align: left; }
-      .scene-art { width: 100px; min-height: 90px; flex: 0 0 auto; font-size: 70px; }
+      .scene-card { min-height: 130px; padding: 12px 17px; }
+      .scene-art { width: 100%; min-height: 90px; font-size: 70px; }
       .question-card { padding: 19px; }
       .answer { min-height: 56px; font-size: 15px; }
       .answer-illustration { width: 34px; font-size: 25px; }
@@ -385,7 +384,6 @@
       <div class="question-layout">
         <aside class="scene-card">
           <div class="scene-art" id="sceneArt" aria-hidden="true"></div>
-          <div class="scene-caption" id="sceneCaption"></div>
         </aside>
         <section class="question-card" aria-labelledby="questionText">
           <div class="question-meta">
@@ -1298,7 +1296,6 @@
       document.getElementById("topicTag").textContent = topic.grade;
       elements.question.textContent = question.text;
       document.getElementById("sceneArt").textContent = question.art;
-      document.getElementById("sceneCaption").textContent = question.scene;
       elements.answers.replaceChildren();
       question.options.forEach((option, index) => {
         const button = document.createElement("button");
@@ -1655,7 +1652,6 @@
       document.getElementById("progressFill").style.width = "100%";
       elements.question.textContent = `Hoàn thành hành trình ${topic.title}!`;
       document.getElementById("sceneArt").textContent = "🏆";
-      document.getElementById("sceneCaption").textContent = "Mỗi lần thử là một khám phá mới.";
       elements.answers.replaceChildren();
       const result = document.createElement("div");
       result.className = "empty-state";
